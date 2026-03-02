@@ -1,0 +1,317 @@
+% beamerinnerthemeqyber.sty -- Qyber beamer inner theme
+%
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+
+\mode<presentation>
+
+% Commands to set layout modes (direct TikZ approach)
+\newcommand{\setlayoutfull}{}
+\newcommand{\setlayoutleft}{
+  \begin{tikzpicture}[remember picture,overlay]
+  \fill[color=bg_page_col] (current page.south west) rectangle ([xshift=0.6\paperwidth]current page.south east);
+  \fill[color=bg_video_col] ([xshift=0.6\paperwidth]current page.south west) rectangle (current page.north east);
+  \end{tikzpicture}
+}
+\newcommand{\setlayoutright}{
+  \begin{tikzpicture}[remember picture,overlay]
+  \fill[color=bg_video_col] (current page.south west) rectangle ([xshift=0.4\paperwidth]current page.south east);
+  \fill[color=bg_page_col] ([xshift=0.4\paperwidth]current page.south west) rectangle (current page.north east);
+  \end{tikzpicture}
+}
+\newcommand{\setlayoutcorner}{
+  \begin{tikzpicture}[remember picture,overlay]
+  \fill[color=bg_page_col] (current page.south west) rectangle (current page.north east);
+  \fill[color=bg_video_col] (current page.south west) rectangle ([xshift=0.25\paperwidth,yshift=0.25\paperheight]current page.south west);
+  \end{tikzpicture}
+}
+\newcommand{\setlayoutoverlay}{
+  \begin{tikzpicture}[remember picture,overlay]
+  \fill[color=bg_video_col] (current page.south west) rectangle (current page.north east);
+  \fill[color=bg_page_col] (current page.south west) rectangle ([xshift=0.4\paperwidth,yshift=0.8\paperheight]current page.south west);
+  \end{tikzpicture}
+}
+
+% Corner position commands
+\newcommand{\setcornerleft}{\cornerpositionfalse}
+\newcommand{\setcornerright}{\cornerpositiontrue}
+
+% Video background color (disabled: match page background to avoid blue box)
+\definecolor{bg_video_col}{rgb}{0.0,0.0,0.0}
+\newcommand{\setvideocolor}[1]{\definecolor{bg_video_col}{rgb}{#1}}
+
+% Default background template (full layout)
+\setbeamertemplate{background}[layoutfull]
+
+% Layout commands for use within regular frames
+% These commands change the layout for the current frame
+
+% Define frame templates for each layout
+\defbeamertemplate*{background}{layoutleft}{
+  \begin{tikzpicture}
+  \useasboundingbox (0,0) rectangle(1\paperwidth,.9\paperheight);
+  \fill[color=bg_page_col] (0,.01\paperheight) rectangle (0.6\paperwidth,.89\paperheight);
+  \fill[color=bg_video_col] (0.6\paperwidth,.01\paperheight) rectangle (1\paperwidth,.89\paperheight);
+  \end{tikzpicture}
+}
+
+\defbeamertemplate{background}{layoutright}{
+  \begin{tikzpicture}
+  \useasboundingbox (0,0) rectangle(1\paperwidth,.9\paperheight);
+  \fill[color=bg_video_col] (0,0) rectangle (0.4\paperwidth,.9\paperheight);
+  \fill[color=bg_page_col] (0.4\paperwidth,0) rectangle (1\paperwidth,.9\paperheight);
+  \end{tikzpicture}
+}
+
+\defbeamertemplate{background}{layoutcorner}{
+  \begin{tikzpicture}
+  \useasboundingbox (0,0) rectangle(1\paperwidth,.9\paperheight);
+  \fill[color=bg_page_col] (0,0) rectangle (1\paperwidth,.9\paperheight);
+  \ifcornerposition
+    % Right corner
+    \fill[color=bg_video_col] (0.75\paperwidth,0.75\paperheight) rectangle (1\paperwidth,.9\paperheight);
+  \else
+    % Left corner
+    \fill[color=bg_video_col] (0,0.75\paperheight) rectangle (0.25\paperwidth,.9\paperheight);
+  \fi
+  \end{tikzpicture}
+}
+
+\defbeamertemplate{background}{layoutoverlay}{
+  \begin{tikzpicture}
+  \useasboundingbox (0,0) rectangle(1\paperwidth,.9\paperheight);
+  \fill[color=bg_video_col] (0,0) rectangle (1\paperwidth,.9\paperheight);
+  \ifcornerposition
+    % Content overlay on right
+    \fill[color=bg_page_col] (0.6\paperwidth,0.1\paperheight) rectangle (1\paperwidth,0.9\paperheight);
+  \else
+    % Content overlay on left
+    \fill[color=bg_page_col] (0,0.1\paperheight) rectangle (0.4\paperwidth,0.9\paperheight);
+  \fi
+  \end{tikzpicture}
+}
+
+\defbeamertemplate{background}{layoutfull}{
+  \begin{tikzpicture}
+  \useasboundingbox (0,0) rectangle(1\paperwidth,.9\paperheight);
+  \fill[color=bg_page_col] (0,0) rectangle (1\paperwidth,.9\paperheight);
+  \end{tikzpicture}
+}
+
+% Layout templates are defined above
+
+% Layout commands now use direct template approach
+
+% Title page templates: basic and split layouts.
+% Padding (qslides sets 12pt/16pt-specific \qyber@titlepagesep)
+\providecommand{\qyber@titlepagesep}{16pt}
+
+% (1) Basic layout: title bar, author centred, date near bottom.
+\defbeamertemplate*{title page}{qyber-basic}[1][]{
+  % Optional title graphic above everything if provided
+  \ifx\inserttitlegraphic\@empty\else
+    \vspace*{1ex}%
+    \begin{center}
+      \inserttitlegraphic\par
+    \end{center}
+    \vspace*{2ex}%
+  \fi
+  % Red header bar with title (and optional subtitle) that can grow vertically
+  \hskip-\beamer@leftmargin\begin{beamercolorbox}[wd=0.8\paperwidth,leftskip=0pt,right,sep=\qyber@titlepagesep,#1]{title page header}
+    {\usebeamerfont{title}\LARGE\inserttitle\par}%
+    \ifx\insertsubtitle\@empty\else
+      \vspace{0.5ex}%
+      {\usebeamerfont{subtitle}\large\insertsubtitle\par}%
+    \fi
+  \end{beamercolorbox}%
+  \vskip4ex\vfill%
+  % Authors / presenter(s)
+  \begin{beamercolorbox}[wd=\paperwidth,center,#1]{author}
+    \usebeamerfont{author}\insertauthor%
+  \end{beamercolorbox}
+  \vfill\vfill%
+  % Date (and place if encoded in \insertshortdate)
+  \begin{beamercolorbox}[wd=\paperwidth,center,#1]{date}
+    \usebeamerfont{author}\textcolor{fg_head_col}{\insertdate}%
+  \end{beamercolorbox}
+  \vspace*{1ex}%
+}
+
+% (2) Split layout: title bar, left area for image/highlights, right for author/date.
+\defbeamertemplate*{title page}{qyber-split}[1][]{
+  % Red header bar with title and optional subtitle
+  \hskip-\beamer@leftmargin\begin{beamercolorbox}[wd=0.8\paperwidth,leftskip=0pt,right,sep=\qyber@titlepagesep,#1]{title page header}
+    {\usebeamerfont{title}\LARGE\inserttitle\par}%
+    \ifx\insertsubtitle\@empty\else
+      \vspace{0.5ex}%
+      {\usebeamerfont{subtitle}\large\insertsubtitle\par}%
+    \fi
+  \end{beamercolorbox}%
+  \begin{columns}[onlytextwidth,T]
+    % Left: title box content (image/highlights/etc.) or fallback to titlegraphic
+    \begin{column}{0.58\textwidth}
+      \ifx\qslides@titlebox\@empty
+        \ifx\inserttitlegraphic\@empty\else
+          \begin{center}
+            \inserttitlegraphic\par
+          \end{center}
+        \fi
+      \else
+        {\qslides@titlebox\par}%
+      \fi
+    \end{column}
+    % Right: author and date stacked, vertically centred using a fixed-height vbox
+    \begin{column}{0.38\textwidth}
+      \vbox to 0.55\paperheight{%
+        \vfill\vfill
+        \begin{beamercolorbox}[wd=\linewidth,center,#1]{author}
+          \usebeamerfont{author}\insertauthor%
+        \end{beamercolorbox}
+        \vfill%
+        \begin{beamercolorbox}[wd=\linewidth,center,#1]{date}
+          \usebeamerfont{author}\textcolor{fg_head_col}{\insertdate}%
+        \end{beamercolorbox}
+        \vfill\vfill\vfill\vfill
+      }%
+    \end{column}
+  \end{columns}
+  \vspace*{1ex}%
+}
+
+% First-level itemize: smaller triangle, vertically aligned; red (header bar) marker
+\setbeamertemplate{itemize item}{%
+  \textcolor{bg_header_bar_col}{\raisebox{0.35ex}{\scalebox{0.75}{\hbox{\donotcoloroutermaths$\blacktriangleright$}}}}%
+}
+\setbeamertemplate{itemize subitem}{\textcolor{bg_header_bar_col}{\scriptsize\raise1.5pt\hbox{\donotcoloroutermaths$\bullet$}}}
+\setbeamertemplate{itemize subsubitem}{\textcolor{bg_header_bar_col}{\scriptsize\raise1.5pt\hbox{\donotcoloroutermaths$\rule{.6em}{1pt}$}}}
+
+\setbeamertemplate{enumerate item}{\textcolor{fg_head_col}{\insertenumlabel.}}
+\setbeamertemplate{enumerate subitem}{\textcolor{fg_head_col}{\insertenumlabel.\insertsubenumlabel}}
+\setbeamertemplate{enumerate subsubitem}{\textcolor{fg_head_col}{\insertenumlabel.\insertsubenumlabel.\insertsubsubenumlabel}}
+\setbeamertemplate{enumerate mini template}{\textcolor{fg_head_col}{\insertenumlabel}}
+
+% List alignment: markers align with text (body or previous item level). Compact spacing.
+% Tighter marker-to-text gap: \labelsep halved inside each list level;
+% \leftmargin and \labelwidth recomputed so indentation stays unchanged.
+\makeatletter
+\def\@listi{\leftmargin\leftmargini
+            \labelsep .25em
+            \labelwidth\leftmargini \advance\labelwidth-\labelsep
+            \topsep 1\p@ \@plus0.5\p@ \@minus1\p@
+            \parsep 0\p@
+            \itemsep 1.5\p@ \@plus1\p@ \@minus1.5\p@}
+\let\@listI\@listi
+\def\@listii{\leftmargin\leftmarginii
+              \labelsep .25em
+              \labelwidth\leftmarginii \advance\labelwidth-\labelsep
+              \topsep 1\p@ \@plus0.5\p@ \@minus1\p@
+              \parsep 0\p@ \@plus\p@
+              \itemsep \parsep}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelsep .25em
+              \labelwidth\leftmarginiii \advance\labelwidth-\labelsep
+              \topsep 1\p@ \@plus0.5\p@ \@minus1\p@
+              \parsep 0\p@ \@plus\p@
+              \itemsep \parsep}
+\makeatother
+
+% Override description-item colour inside blocks so labels are legible on dark backgrounds.
+\setbeamercolor{description item}{fg=fg_highlight_col}
+
+% Blocks: header = bg_header_col (red), body = block-type bg. Empty title = body only (no header).
+\defbeamertemplate*{block begin}{qyber}[1][shadow=false]{%
+  \par\vskip\medskipamount
+  \begin{beamerboxesrounded}[upper=block title,lower=block body,#1]
+    {\raggedright\usebeamerfont*{block title}\insertblocktitle}
+    \raggedright
+    \usebeamerfont{block body}%
+}
+\defbeamertemplate*{block end}{qyber}[1][]{%
+  \end{beamerboxesrounded}
+  \vskip\smallskipamount
+}
+\defbeamertemplate*{block alerted begin}{qyber}[1][shadow=false]{%
+  \par\vskip\medskipamount
+  \begin{beamerboxesrounded}[upper=block title alerted,lower=block body alerted,#1]
+    {\raggedright\usebeamerfont*{block title alerted}\insertblocktitle}
+    \raggedright
+    \usebeamerfont{block body alerted}%
+}
+\defbeamertemplate*{block alerted end}{qyber}[1][]{%
+  \end{beamerboxesrounded}
+  \vskip\smallskipamount
+}
+\defbeamertemplate*{block example begin}{qyber}[1][shadow=false]{%
+  \par\vskip\medskipamount
+  \begin{beamerboxesrounded}[upper=block title example,lower=block body example,#1]
+    {\raggedright\usebeamerfont*{block title example}\insertblocktitle}
+    \raggedright
+    \usebeamerfont{block body example}%
+}
+\defbeamertemplate*{block example end}{qyber}[1][]{%
+  \end{beamerboxesrounded}
+  \vskip\smallskipamount
+}
+% Custom block types: code (blue), result (olive), success (green). Same with/without header.
+\defbeamertemplate*{block code begin}{qyber}[1][shadow=false]{%
+  \par\vskip\medskipamount
+  \begin{beamerboxesrounded}[upper=block title code,lower=block body code,#1]
+    {\raggedright\usebeamerfont*{block title}\insertblocktitle}
+    \raggedright
+    \usebeamerfont{block body}%
+}
+\defbeamertemplate*{block code end}{qyber}[1][]{%
+  \end{beamerboxesrounded}
+  \vskip\smallskipamount
+}
+\defbeamertemplate*{block result begin}{qyber}[1][shadow=false]{%
+  \par\vskip\medskipamount
+  \begin{beamerboxesrounded}[upper=block title result,lower=block body result,#1]
+    {\raggedright\usebeamerfont*{block title}\insertblocktitle}
+    \raggedright
+    \usebeamerfont{block body}%
+}
+\defbeamertemplate*{block result end}{qyber}[1][]{%
+  \end{beamerboxesrounded}
+  \vskip\smallskipamount
+}
+\defbeamertemplate*{block success begin}{qyber}[1][shadow=false]{%
+  \par\vskip\medskipamount
+  \begin{beamerboxesrounded}[upper=block title success,lower=block body success,#1]
+    {\raggedright\usebeamerfont*{block title}\insertblocktitle}
+    \raggedright
+    \usebeamerfont{block body}%
+}
+\defbeamertemplate*{block success end}{qyber}[1][]{%
+  \end{beamerboxesrounded}
+  \vskip\smallskipamount
+}
+
+% Custom block environments: codeblock, resultblock, successblock. Empty title = no header.
+\newenvironment<>{codeblock}[1]{%
+  \begin{actionenv}#2%
+  \def\insertblocktitle{#1}%
+  \par%
+  \usebeamertemplate{block code begin}}
+{\par%
+  \usebeamertemplate{block code end}%
+  \end{actionenv}}
+\newenvironment<>{resultblock}[1]{%
+  \begin{actionenv}#2%
+  \def\insertblocktitle{#1}%
+  \par%
+  \usebeamertemplate{block result begin}}
+{\par%
+  \usebeamertemplate{block result end}%
+  \end{actionenv}}
+\newenvironment<>{successblock}[1]{%
+  \begin{actionenv}#2%
+  \def\insertblocktitle{#1}%
+  \par%
+  \usebeamertemplate{block success begin}}
+{\par%
+  \usebeamertemplate{block success end}%
+  \end{actionenv}}
+
+\mode<all>
+

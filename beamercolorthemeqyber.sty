@@ -1,0 +1,165 @@
+% beamercolorthemeqyber.sty -- Qyber beamer colour theme
+%
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+
+\mode<presentation>
+
+% Colours for qyber theme (single, fixed palette), with consistent naming:
+% - bg_*_col : background colours
+% - fg_*_col : foreground / text colours
+% - ac_*_col : accent colours (rules, emphasis, symbols, etc.)
+%
+% Core backgrounds (unchanged):
+% - bg_page_col         : main slide background (black)
+% - bg_surface_col      : slightly brighter black for footer / surface accents
+% - bg_highlight_col    : orange highlight bar background
+%
+% Header and block-type backgrounds (aligned with block names):
+% - bg_header_col       : red header bar (block titles)
+% - bg_code_col         : blue (code block)
+% - bg_example_col      : violet (example block)
+% - bg_result_col       : olive (result block)
+% - bg_success_col      : green (success block)
+% - bg_error_col        : red (error block)
+% - bg_info_col         : cyan (info block)
+%
+% Foregrounds (canonical names):
+% - fg_body_col       : primary body text (white)
+% - fg_head_col       : headings, header bar text (yellow/gold)
+% - fg_footer_col     : footer text (same for bar and general footer)
+% - fg_highlight_col  : highlight/alert text and \hi background (orange, not black)
+% - fg_emph_col       : emphasis text (green, replaces ac_emphasis_col)
+% - fg_header_bar_col  : header bar shadow (dark green; optional)
+% - fg_ref_col        : green link color (references, URLs)
+% - fg_link_col       : blue link color (other links)
+%
+% Accents (optional):
+% - ac_rule_col      : green rule/bullet accent (available for user rules)
+% - ac_en_symbol_col : used by \ensymbol (e.g. emphasis marker « -- »)
+
+% Bar and header
+\definecolor{fg_head_col}{rgb}{0.9,0.7,0.0}
+\definecolor{bg_header_bar_col}{rgb}{0.5,0.0,0.0}
+\definecolor{fg_header_bar_col}{rgb}{0.0,0.2,0.0}
+\colorlet{bg_header_col}{bg_header_bar_col}
+\colorlet{bar_text_col}{fg_head_col}
+\colorlet{bar_background_col}{bg_header_col}
+\colorlet{fg_header_bar_text_col}{fg_head_col}
+
+\def\bar_background_gradient{qyber_red_black_gradient.png}
+
+% Footer and surface
+\definecolor{fg_footer_col}{rgb}{0.65,0.65,0.65}
+\definecolor{bg_surface_col}{rgb}{0.08,0.08,0.08}
+\colorlet{bar_text2_col}{fg_footer_col}
+\colorlet{bar_background2_col}{bg_surface_col}
+\colorlet{fg_footer_bar_text_col}{fg_footer_col}
+
+% Slide content
+\definecolor{bg_page_col}{rgb}{0.0,0.0,0.0}
+\definecolor{fg_body_col}{rgb}{1.0,1.0,1.0}
+\definecolor{fg_emph_col}{rgb}{0.0,0.6,0.0}
+\definecolor{ac_rule_col}{rgb}{0.0,0.8,0.0}
+\colorlet{page_col}{bg_page_col}
+\colorlet{text_col}{fg_body_col}
+\colorlet{head_col}{fg_head_col}
+\colorlet{foot_col}{fg_footer_col}
+\colorlet{ac_emphasis_col}{fg_emph_col}
+\colorlet{em_col}{fg_emph_col}
+\colorlet{line_col}{ac_rule_col}
+
+% Highlight: orange (visible on dark slides); used for \alert and \hi background
+\definecolor{fg_highlight_col}{rgb}{0.88,0.55,0.0}
+\definecolor{bg_highlight_col}{rgb}{0.7,0.5,0.0}
+\colorlet{hi_text_col}{fg_highlight_col}
+\colorlet{hi_background_col}{bg_highlight_col}
+\colorlet{fg_highlight_text_col}{fg_highlight_col}
+
+% Link colors
+\definecolor{fg_ref_col}{rgb}{0.0,0.65,0.0}
+\definecolor{fg_link_col}{rgb}{0.35,0.5,0.85}
+
+% Block-type backgrounds: perceptually similar luminance (~0.10) so white text has even contrast.
+\definecolor{bg_error_col}{rgb}{0.25,0.05,0.05}       % dark red
+\definecolor{bg_example_col}{rgb}{0.16,0.04,0.16}    % dark violet
+\definecolor{bg_code_col}{rgb}{0.05,0.05,0.25}        % dark blue
+\definecolor{bg_info_col}{rgb}{0.03,0.12,0.12}       % dark cyan
+\definecolor{bg_success_col}{rgb}{0.03,0.13,0.03}    % dark green
+\definecolor{bg_result_col}{rgb}{0.10,0.10,0.03}     % dark olive
+% Backwards-compatible aliases (old panel names)
+\colorlet{bg_error_panel_col}{bg_error_col}
+\colorlet{bg_error_panel_alt_col}{bg_example_col}
+\colorlet{bg_info_panel_col}{bg_code_col}
+\colorlet{bg_info_panel_alt_col}{bg_info_col}
+\colorlet{bg_success_panel_col}{bg_success_col}
+\colorlet{bg_warning_panel_col}{bg_result_col}
+\colorlet{panel_bg_error}{bg_error_col}
+\colorlet{panel_bg_error_alt}{bg_example_col}
+\colorlet{panel_bg_info}{bg_code_col}
+\colorlet{panel_bg_info_alt}{bg_info_col}
+\colorlet{panel_bg_success}{bg_success_col}
+\colorlet{panel_bg_warning}{bg_result_col}
+\colorlet{bg_code_panel_col}{bg_code_col}
+\colorlet{bg_result_panel_col}{bg_result_col}
+\colorlet{fg_code_panel_col}{fg_body_col}
+\colorlet{fg_result_panel_col}{fg_body_col}
+\colorlet{code_background_col}{bg_code_col}
+\colorlet{code_text_col}{fg_body_col}
+\colorlet{result_background_col}{bg_result_col}
+\colorlet{result_text_col}{fg_body_col}
+
+% Symbols for tags
+\def\marksymbol{\includegraphics[width=1em]{qyber_mark_black.png}}
+\def\blobsymbol{\includegraphics[width=.8em]{qyber_blob_black.png}}
+\definecolor{ac_en_symbol_col}{rgb}{0.5,0.0,0.5}
+\def\ensymbol{\textcolor{ac_en_symbol_col}{\bfseries --}}
+\def\arrowsymbol{\includegraphics[width=1em]{qyber_arrow_black.png}}
+\def\questionsymbol{\raisebox{-1.5ex}{\includegraphics[width=1em]{qyber_question_black.png}}}
+
+% Settings (shared between palettes)
+\setbeamercolor{normal text}{fg=fg_body_col,bg=bg_page_col}
+\setbeamercolor{alerted text}{fg=fg_highlight_col}
+\setbeamercolor{example text}{fg=fg_body_col,bg=bg_example_col}
+
+\setbeamercolor{structure}{fg=fg_head_col,bg=bg_header_col}
+
+\setbeamercolor{background canvas}{parent=normal text}
+\setbeamercolor{background}{parent=background canvas}
+
+\setbeamercolor{palette primary}{fg=yellow,bg=yellow} % unchanged
+\setbeamercolor{palette secondary}{use=structure,fg=structure.fg!100!green}
+\setbeamercolor{palette tertiary}{use=structure,fg=structure.fg!100!green}
+
+\setbeamercolor*{title page header}{bg=bg_header_col,fg=fg_head_col}
+\setbeamercolor*{author}{fg=fg_body_col}
+\setbeamercolor*{date}{fg=fg_body_col}
+\setbeamercolor*{item}{fg=bg_header_col}
+
+\setbeamercolor*{author in head/foot}{fg=fg_head_col,bg=bg_header_col}
+
+% Footer
+\setbeamercolor*{footer}{fg=fg_footer_col,bg=bg_surface_col}
+
+% Blocks: header and body use the same block-type bg. Empty title = body only (no header).
+% block = info (cyan)
+\setbeamercolor*{block title}{fg=fg_body_col,bg=bg_info_col}
+\setbeamercolor*{block body}{fg=fg_body_col,bg=bg_info_col}
+% alertblock = error (red)
+\setbeamercolor*{block title alerted}{fg=fg_body_col,bg=bg_error_col}
+\setbeamercolor*{block body alerted}{fg=fg_body_col,bg=bg_error_col}
+% exampleblock = example (violet)
+\setbeamercolor*{block title example}{fg=fg_body_col,bg=bg_example_col}
+\setbeamercolor*{block body example}{fg=fg_body_col,bg=bg_example_col}
+% codeblock = code (blue)
+\setbeamercolor*{block title code}{fg=fg_body_col,bg=bg_code_col}
+\setbeamercolor*{block body code}{fg=fg_body_col,bg=bg_code_col}
+% resultblock = result (olive)
+\setbeamercolor*{block title result}{fg=fg_body_col,bg=bg_result_col}
+\setbeamercolor*{block body result}{fg=fg_body_col,bg=bg_result_col}
+% successblock = success (green)
+\setbeamercolor*{block title success}{fg=fg_body_col,bg=bg_success_col}
+\setbeamercolor*{block body success}{fg=fg_body_col,bg=bg_success_col}
+
+\mode<all>
+

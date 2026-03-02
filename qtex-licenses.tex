@@ -1,0 +1,21 @@
+% qtex-licenses.tex -- Full license texts for \license{SPDX-ID} (qbook/qarticle)
+% Loaded automatically by qtex.sty when \license{...} is set. Uses qtex@ prefix.
+%
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+
+\makeatletter
+\expandafter\def\csname qtex@licensetext@MIT\endcsname{%
+  \begin{quote}\small\raggedright
+    MIT License. Copyright (c) \ifstrempty{\qtex@licenseyear}{\number\year}{\qtex@licenseyear}\ %
+    \ifstrempty{\qtex@copyrightholder}{\qtex@author}{\qtex@copyrightholder}.\\
+    Full text: \url{https://spdx.org/licenses/MIT.html}
+  \end{quote}%
+}
+\expandafter\def\csname qtex@licensetext@LPPL-1.3c\endcsname{%
+  \begin{quote}\small\raggedright
+    LaTeX Project Public License 1.3c.\\
+    Full text: \url{https://www.latex-project.org/lppl/lppl-1-3c.html}
+  \end{quote}%
+}
+\makeatother

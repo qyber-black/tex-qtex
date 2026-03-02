@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+# SPDX-License-Identifier: LPPL-1.3c
+#
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.loa
+*.bbl
+*.blg
+*.run.xml
+*.bcf
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+examples/qbook/main.pdf
+examples/qarticle/main.pdf
+examples/qslides/main.pdf
+fonts/

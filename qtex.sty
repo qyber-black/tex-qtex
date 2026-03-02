@@ -1,0 +1,725 @@
+% qtex.sty -- Shared package for qbook and qarticle
+% Options, fonts, geometry, floats, LOF/LOT/LOA, natbib, glossaries, caption,
+% fullwidth, layout, hyperref. Doctype option: book | article.
+%
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{qtex}[2026/03/02 Qyber shared typography and layout]
+
+\makeatletter
+
+% ------------------------------------------------------------------------------
+% Package options (doctype + same as qthesis/qdissertation)
+% ------------------------------------------------------------------------------
+\def\qtex@doctype{book}
+\newif\ifqtex@slides
+\qtex@slidesfalse
+\DeclareOption{book}{\def\qtex@doctype{book}\qtex@slidesfalse}
+\DeclareOption{article}{\def\qtex@doctype{article}\qtex@slidesfalse}
+\DeclareOption{slides}{\def\qtex@doctype{slides}\qtex@slidestrue}
+
+\newif\ifqtex@justify
+\qtex@justifyfalse
+\DeclareOption{raggedright}{\qtex@justifyfalse}
+\DeclareOption{justified}{\qtex@justifytrue}
+
+\newif\ifqtex@font@sans
+\newif\ifqtex@font@serif
+\newif\ifqtex@font@hacker
+\newif\ifqtex@twoside
+\newif\ifqtex@cite@harvard
+
+\qtex@font@sanstrue
+\qtex@font@seriffalse
+\qtex@font@hackerfalse
+\qtex@twosidefalse
+\qtex@cite@harvardfalse
+
+\DeclareOption{sans}{%
+  \qtex@font@sanstrue
+  \qtex@font@seriffalse
+  \qtex@font@hackerfalse
+}
+\DeclareOption{serif}{%
+  \qtex@font@sansfalse
+  \qtex@font@seriftrue
+  \qtex@font@hackerfalse
+}
+\DeclareOption{hacker}{%
+  \qtex@font@sansfalse
+  \qtex@font@seriffalse
+  \qtex@font@hackertrue
+}
+
+\newif\ifqtex@noobfuscate
+\qtex@noobfuscatetrue
+\DeclareOption{noobfuscate}{\qtex@noobfuscatetrue}
+\DeclareOption{obfuscate}{\qtex@noobfuscatefalse}
+
+\DeclareOption{harvard}{\qtex@cite@harvardtrue}
+\DeclareOption{numeric}{\qtex@cite@harvardfalse}
+
+\DeclareOption{twoside}{\qtex@twosidetrue}
+\DeclareOption{oneside}{\qtex@twosidefalse}
+
+% Line spacing: single default for both book and article; options as in qthesis/qdissertation
+\newif\ifqtex@onehalfspacing
+\newif\ifqtex@linespread
+\qtex@onehalfspacingfalse
+\qtex@linespreadfalse
+\DeclareOption{single}{\qtex@onehalfspacingfalse\qtex@linespreadfalse}
+\DeclareOption{onehalfspacing}{\qtex@onehalfspacingtrue\qtex@linespreadfalse}
+\DeclareOption{linespread115}{\qtex@linespreadtrue\def\qtex@linespreadval{1.15}}
+\DeclareOption{linespread12}{\qtex@linespreadtrue\def\qtex@linespreadval{1.2}}
+
+\newif\ifqtex@parindent
+\qtex@parindentfalse
+\DeclareOption{parskip}{\qtex@parindentfalse}
+\DeclareOption{parindent}{\qtex@parindenttrue}
+
+\newif\ifqtex@fullwidth
+\qtex@fullwidthfalse
+\DeclareOption{fullwidth}{\qtex@fullwidthtrue}
+
+\newif\ifqtex@italic
+\qtex@italicfalse
+\DeclareOption{italic}{\qtex@italictrue}
+
+\DeclareOption*{\OptionNotUsed}
+\ProcessOptions\relax
+
+% ------------------------------------------------------------------------------
+% Packages (required for layout and behaviour)
+% ------------------------------------------------------------------------------
+\RequirePackage{iftex}
+\ifPDFTeX
+  \RequirePackage[T1]{fontenc}%
+  \RequirePackage[utf8]{inputenc}%
+  \RequirePackage{lmodern}%
+\fi
+
+\RequirePackage{fix-cm}
+\ifqtex@slides
+  % For beamer-based slide decks, let the class manage page size/layout.
+\else
+  \RequirePackage[a4paper,margin=3.0cm]{geometry}
+\fi
+
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{4}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{6}
+
+\RequirePackage{graphicx}
+\RequirePackage{amsmath,amsfonts,amssymb}
+\RequirePackage[dvipsnames,svgnames]{xcolor}
+\RequirePackage[tracking]{microtype}
+% Slides (beamer) manage vertical spacing themselves; only non-slide
+% doctypes use setspace for line spacing adjustments.
+\ifqtex@slides
+  % no setspace for slides
+\else
+  \RequirePackage{setspace}
+\fi
+\ifqtex@justify
+  \RequirePackage{ragged2e}%
+\else
+  \RequirePackage[document]{ragged2e}%
+\fi
+\RequirePackage{etoolbox}
+\ifqtex@fullwidth
+  \IfFileExists{changepage.sty}{%
+    \RequirePackage[strict]{changepage}%
+  }{%
+    \IfFileExists{chngpage.sty}{%
+      \RequirePackage[strict]{chngpage}%
+    }{%
+      \PackageWarning{qtex}{fullwidth option requires changepage or chngpage; fullwidth disabled}%
+      \qtex@fullwidthfalse
+    }%
+  }%
+\fi
+
+% LOF/LOT/LOA writefile patch (guarded allocation; skipped for slides)
+\ifqtex@slides\else
+\@ifundefined{tf@lof}{\newwrite\tf@lof}{}%
+\@ifundefined{tf@lot}{\newwrite\tf@lot}{}%
+\@ifundefined{tf@loa}{\newwrite\tf@loa}{}%
+\long\def\qtex@writelist#1#2{%
+  \@ifundefined{qtex@opened@#1}{%
+    \immediate\openout\csname tf@#1\endcsname\jobname.#1
+    \expandafter\gdef\csname qtex@opened@#1\endcsname{}%
+  }{}%
+  \immediate\write\csname tf@#1\endcsname{\unexpanded{#2}}%
+}
+\def\qtex@write@lof#1{\qtex@writelist{lof}{#1}}
+\def\qtex@write@lot#1{\qtex@writelist{lot}{#1}}
+\def\qtex@write@loa#1{\qtex@writelist{loa}{#1}}
+\long\def\qtex@writefile#1#2{%
+  \edef\qtex@write@arg{#1}%
+  \ifx\qtex@write@arg\qtex@lofstr
+    \qtex@write@lof{#2}%
+  \else
+    \ifx\qtex@write@arg\qtex@lotstr
+      \qtex@write@lot{#2}%
+    \else
+      \ifx\qtex@write@arg\qtex@loastr
+        \qtex@write@loa{#2}%
+      \else
+        \@gobbletwo{#1}{#2}%
+      \fi
+    \fi
+  \fi
+}
+\def\qtex@lofstr{lof}\def\qtex@lotstr{lot}\def\qtex@loastr{loa}
+\patchcmd{\document}{\let\@writefile\@gobbletwo}{\let\@writefile\qtex@writefile}{}{}
+\fi
+
+\ifqtex@cite@harvard
+  \RequirePackage[authoryear,round,sort&compress,longnamesfirst]{natbib}%
+  \bibpunct{(}{)}{;}{a}{,}{,}%
+\else
+  \RequirePackage[numbers,sort&compress,square]{natbib}%
+  \bibpunct{[}{]}{,}{n}{,}{,}%
+\fi
+\RequirePackage{xurl}
+\RequirePackage{hyperref}
+\ifPDFTeX
+  \RequirePackage[hyphenbreaks]{breakurl}%
+\fi
+
+\RequirePackage[acronym,nomain,toc]{glossaries}
+\setacronymstyle{long-short}
+\makeglossaries
+\newif\ifqtex@hasacronyms
+\qtex@hasacronymsfalse
+\pretocmd{\newacronym}{\global\qtex@hasacronymstrue}{}{}
+\newcommand{\qtexacronymfile}{acronyms.tex}
+\IfFileExists{\qtexacronymfile}{\input{\qtexacronymfile}}{}
+\AtBeginDocument{\glsaddall}
+
+\renewcommand{\cite}{%
+  \PackageWarning{qtex}{Use \string\citep\space or \string\citet\space instead of \string\cite}%
+  \citep
+}
+
+\RequirePackage[font=small]{caption}
+\setlength{\abovecaptionskip}{6pt}%
+\setlength{\belowcaptionskip}{6pt}%
+\ifqtex@italic
+  \captionsetup{labelfont=it,textfont=it}%
+\fi
+\RequirePackage{textcomp}
+
+\newcommand{\epigraph}[2]{%
+  \par\vspace{0.8\baselineskip}%
+  \noindent\hfill\parbox{0.6\textwidth}{\raggedleft\small
+    #1\par\vspace{0.3ex}%
+    \textls[50]{\scshape #2}%
+  }%
+  \par\vspace{0.6\baselineskip}%
+}
+
+% ------------------------------------------------------------------------------
+% Font configuration (sans default, serif, hacker)
+% ------------------------------------------------------------------------------
+\ifPDFTeX
+  \ifqtex@font@sans
+    \RequirePackage[default]{sourcesanspro}%
+    \RequirePackage{newtxmath}%
+    \renewcommand{\familydefault}{\sfdefault}%
+  \fi
+  \ifqtex@font@serif
+    \RequirePackage[default]{sourceserifpro}%
+    \RequirePackage{newtxmath}%
+  \fi
+  \ifqtex@font@hacker
+    \RequirePackage{inconsolata}%
+    \RequirePackage{newtxmath}%
+    \renewcommand{\familydefault}{\ttdefault}%
+  \fi
+\else
+  \RequirePackage{fontspec}%
+  \defaultfontfeatures{Ligatures=TeX}%
+  \ifluatex
+    \ifqtex@noobfuscate \else
+      \IfFileExists{fonts/obfuscate-perm.lua}{%
+        \directlua{%
+          local perm = dofile("fonts/obfuscate-perm.lua")
+          local PUA = 0xE000
+          luatexbase.add_to_callback("luaotfload.patch_font", function(tfmdata)
+            if not tfmdata or not tfmdata.characters then return end
+            if not tfmdata.characters[PUA] then return end
+            if tfmdata.characters[0x41] then return end
+            tfmdata.embedding = "full"
+            tfmdata.qtex_obfuscated = true
+            for c = 0, 255 do
+              local src = PUA + perm[c]
+              if tfmdata.characters[src] then
+                tfmdata.characters[c] = tfmdata.characters[src]
+              end
+            end
+            for c = 0, 255 do
+              local slot = PUA + perm[c]
+              if tfmdata.characters[slot] then
+                tfmdata.characters[slot].unicode = slot
+                tfmdata.characters[slot].tounicode = slot
+              end
+            end
+          end, "qtex_obfuscate_full_embed")
+        }%
+        \AtBeginDocument{%
+          \directlua{%
+            local perm = dofile("fonts/obfuscate-perm.lua")
+            local PUA = 0xE000
+            local hlist_id = node.id("hlist")
+            local vlist_id = node.id("vlist")
+            local function obfuscate_glyphs(head)
+              for n in node.traverse(head) do
+                if n.id == node.id("glyph") then
+                  local tfm = fonts.hashes.identifiers[n.font]
+                  if tfm and tfm.qtex_obfuscated and n.char >= 0 and n.char <= 255 and perm[n.char] then
+                    n.char = PUA + perm[n.char]
+                  end
+                elseif (n.id == hlist_id or n.id == vlist_id) and n.head then
+                  obfuscate_glyphs(n.head)
+                end
+              end
+              return head
+            end
+            luatexbase.add_to_callback("pre_linebreak_filter", obfuscate_glyphs, "qtex_obfuscate")
+            luatexbase.add_to_callback("pre_output_filter", obfuscate_glyphs, "qtex_obfuscate")
+          }%
+        }%
+      }{%
+        \PackageError{qtex}{%
+          Obfuscation requires fonts/obfuscate-perm.lua.\MessageBreak
+          Generate it with the build script (see README).%
+        }{Then re-run LaTeX.}%
+      }%
+    \fi
+  \else
+    \ifqtex@noobfuscate \else
+      \PackageWarningNoLine{qtex}{Obfuscation is LuaLaTeX-only; using normal fonts}%
+    \fi
+  \fi
+  \ifqtex@font@sans
+    \ifluatex \ifqtex@noobfuscate \else
+      \IfFileExists{fonts/sans-obfuscated.otf}{%
+        \def\qtex@obf@opts{Path=fonts/,Extension=.otf}%
+        \IfFileExists{fonts/sans-obfuscated-Bold.otf}{\g@addto@macro\qtex@obf@opts{,BoldFont=sans-obfuscated-Bold}}{}%
+        \IfFileExists{fonts/sans-obfuscated-Italic.otf}{\g@addto@macro\qtex@obf@opts{,ItalicFont=sans-obfuscated-Italic}}{}%
+        \IfFileExists{fonts/sans-obfuscated-BoldItalic.otf}{\g@addto@macro\qtex@obf@opts{,BoldItalicFont=sans-obfuscated-BoldItalic}}{}%
+        \setmainfont{sans-obfuscated}[\qtex@obf@opts]%
+        \setsansfont{sans-obfuscated}[\qtex@obf@opts]%
+        \setmonofont{sans-obfuscated}[\qtex@obf@opts]%
+        \renewcommand{\labelitemi}{\normalfont\char"B7}%
+        \renewcommand{\labelitemii}{\normalfont\char"B7}%
+        \renewcommand{\labelitemiii}{\normalfont\char"B7}%
+        \renewcommand{\labelitemiv}{\normalfont\char"B7}%
+      }{%
+        \PackageError{qtex}{Obfuscation requires fonts/sans-obfuscated.otf. Generate with build script.}{}%
+      }%
+    \fi \fi
+    \ifqtex@noobfuscate
+      \IfFontExistsTF{Source Sans Pro}{%
+        \setmainfont{Source Sans Pro}%
+        \setsansfont{Source Sans Pro}%
+        \IfFontExistsTF{Source Code Pro}{\setmonofont{Source Code Pro}[Scale=MatchLowercase]}{\setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]}%
+      }{%
+        \setmainfont{TeX Gyre Heros}%
+        \setsansfont{TeX Gyre Heros}%
+        \setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]%
+      }%
+    \else \ifluatex \else
+      \IfFontExistsTF{Source Sans Pro}{%
+        \setmainfont{Source Sans Pro}%
+        \setsansfont{Source Sans Pro}%
+        \IfFontExistsTF{Source Code Pro}{\setmonofont{Source Code Pro}[Scale=MatchLowercase]}{\setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]}%
+      }{%
+        \setmainfont{TeX Gyre Heros}%
+        \setsansfont{TeX Gyre Heros}%
+        \setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]%
+      }%
+    \fi \fi
+  \fi
+  \ifqtex@font@serif
+    \ifluatex \ifqtex@noobfuscate \else
+      \IfFileExists{fonts/serif-obfuscated.otf}{%
+        \def\qtex@obf@opts{Path=fonts/,Extension=.otf}%
+        \IfFileExists{fonts/serif-obfuscated-Bold.otf}{\g@addto@macro\qtex@obf@opts{,BoldFont=serif-obfuscated-Bold}}{}%
+        \IfFileExists{fonts/serif-obfuscated-Italic.otf}{\g@addto@macro\qtex@obf@opts{,ItalicFont=serif-obfuscated-Italic}}{}%
+        \IfFileExists{fonts/serif-obfuscated-BoldItalic.otf}{\g@addto@macro\qtex@obf@opts{,BoldItalicFont=serif-obfuscated-BoldItalic}}{}%
+        \setmainfont{serif-obfuscated}[\qtex@obf@opts]%
+        \setsansfont{serif-obfuscated}[\qtex@obf@opts]%
+        \setmonofont{serif-obfuscated}[\qtex@obf@opts]%
+        \renewcommand{\labelitemi}{\normalfont\char"B7}%
+        \renewcommand{\labelitemii}{\normalfont\char"B7}%
+        \renewcommand{\labelitemiii}{\normalfont\char"B7}%
+        \renewcommand{\labelitemiv}{\normalfont\char"B7}%
+      }{%
+        \PackageError{qtex}{Obfuscation requires fonts/serif-obfuscated.otf. Generate with build script.}{}%
+      }%
+    \fi \fi
+    \ifqtex@noobfuscate
+      \IfFontExistsTF{Source Serif Pro}{%
+        \setmainfont{Source Serif Pro}%
+        \setsansfont{Source Sans Pro}[Scale=MatchLowercase]%
+        \IfFontExistsTF{Source Code Pro}{\setmonofont{Source Code Pro}[Scale=MatchLowercase]}{\setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]}%
+      }{%
+        \setmainfont{TeX Gyre Termes}%
+        \setsansfont{TeX Gyre Heros}[Scale=MatchLowercase]%
+        \setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]%
+      }%
+    \else \ifluatex \else
+      \IfFontExistsTF{Source Serif Pro}{%
+        \setmainfont{Source Serif Pro}%
+        \setsansfont{Source Sans Pro}[Scale=MatchLowercase]%
+        \IfFontExistsTF{Source Code Pro}{\setmonofont{Source Code Pro}[Scale=MatchLowercase]}{\setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]}%
+      }{%
+        \setmainfont{TeX Gyre Termes}%
+        \setsansfont{TeX Gyre Heros}[Scale=MatchLowercase]%
+        \setmonofont{TeX Gyre Cursor}[Scale=MatchLowercase]%
+      }%
+    \fi \fi
+  \fi
+  \ifqtex@font@hacker
+    \ifluatex \ifqtex@noobfuscate \else
+      \IfFileExists{fonts/hacker-obfuscated.otf}{%
+        \def\qtex@obf@opts{Path=fonts/,Extension=.otf}%
+        \IfFileExists{fonts/hacker-obfuscated-Bold.otf}{\g@addto@macro\qtex@obf@opts{,BoldFont=hacker-obfuscated-Bold}}{}%
+        \IfFileExists{fonts/hacker-obfuscated-Italic.otf}{\g@addto@macro\qtex@obf@opts{,ItalicFont=hacker-obfuscated-Italic}}{}%
+        \IfFileExists{fonts/hacker-obfuscated-BoldItalic.otf}{\g@addto@macro\qtex@obf@opts{,BoldItalicFont=hacker-obfuscated-BoldItalic}}{}%
+        \setmainfont{hacker-obfuscated}[\qtex@obf@opts]%
+        \setsansfont{hacker-obfuscated}[\qtex@obf@opts]%
+        \setmonofont{hacker-obfuscated}[\qtex@obf@opts]%
+        \renewcommand{\labelitemi}{\normalfont\char"B7}%
+        \renewcommand{\labelitemii}{\normalfont\char"B7}%
+        \renewcommand{\labelitemiii}{\normalfont\char"B7}%
+        \renewcommand{\labelitemiv}{\normalfont\char"B7}%
+      }{%
+        \PackageError{qtex}{Obfuscation requires fonts/hacker-obfuscated.otf. Generate with build script.}{}%
+      }%
+    \fi \fi
+    \ifqtex@noobfuscate
+      \IfFontExistsTF{Inconsolata}{%
+        \setmainfont{Inconsolata}%
+        \setsansfont{Inconsolata}%
+        \setmonofont{Inconsolata}%
+      }{\setmainfont{Fira Mono}\setsansfont{Fira Mono}\setmonofont{Fira Mono}}%
+    \else \ifluatex \else
+      \PackageWarning{qtex}{Obfuscation is LuaLaTeX-only; using normal hacker font.}%
+      \IfFontExistsTF{Inconsolata}{%
+        \setmainfont{Inconsolata}%
+        \setsansfont{Inconsolata}%
+        \setmonofont{Inconsolata}%
+      }{\setmainfont{Fira Mono}\setsansfont{Fira Mono}\setmonofont{Fira Mono}}%
+    \fi \fi
+  \fi
+  \RequirePackage{unicode-math}%
+  \setmathfont{Latin Modern Math}[Scale=MatchLowercase]%
+\fi
+
+% ------------------------------------------------------------------------------
+% Layout: single default; onehalfspacing / linespread options
+% (disabled for slides so beamer keeps control of spacing).
+% ------------------------------------------------------------------------------
+\ifqtex@slides
+  % Slides: use beamer's default spacing (no setspace).
+\else
+  \ifqtex@onehalfspacing
+    \onehalfspacing
+  \else
+    \ifqtex@linespread
+      \linespread{\qtex@linespreadval}%
+    \else
+      \singlespacing
+    \fi
+  \fi
+\fi
+\ifqtex@justify\else \RaggedRight\fi
+\emergencystretch=3em
+
+\setlength{\leftmargini}{1pc}
+\setlength{\leftmarginii}{1pc}
+\setlength{\leftmarginiii}{1pc}
+\setlength{\leftmarginiv}{1pc}
+\setlength{\leftmarginv}{1pc}
+\setlength{\leftmarginvi}{1pc}
+\setlength{\labelsep}{0.5pc}
+\setlength{\labelwidth}{\leftmargini}
+\addtolength{\labelwidth}{-\labelsep}
+
+\renewenvironment{verse}
+ {\let\\\@centercr
+  \list{}{\itemsep \z@
+  \itemindent -1pc%
+  \listparindent\itemindent
+  \rightmargin \leftmargin
+  \advance\leftmargin 1pc}%
+  \small%
+  \item\relax}
+ {\endlist}
+\renewenvironment{quotation}
+ {\list{}{\listparindent 1pc%
+  \itemindent \listparindent
+  \rightmargin \leftmargin
+  \parsep \z@ \@plus\p@}%
+  \small%
+  \item\relax\noindent\ignorespaces}
+ {\endlist}
+\renewenvironment{quote}
+ {\list{}{\rightmargin\leftmargin}%
+  \small%
+  \item\relax}
+ {\endlist}
+
+\ifqtex@parindent
+  \setlength{\parindent}{1em}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\RaggedRightParindent}{1em}%
+\else
+  \RequirePackage{parskip}%
+\fi
+
+\newlength{\qtex@fullwidth@overhang}
+\setlength{\qtex@fullwidth@overhang}{2cm}
+\ifqtex@fullwidth
+  \newenvironment{fullwidth}{%
+    \begin{adjustwidth}{-\qtex@fullwidth@overhang}{-\qtex@fullwidth@overhang}%
+  }{%
+    \end{adjustwidth}%
+  }
+  \newenvironment{fullwidthfigure}[1][htbp]{%
+    \begin{figure}[#1]%
+    \begin{adjustwidth}{-\qtex@fullwidth@overhang}{-\qtex@fullwidth@overhang}%
+    \centering
+  }{%
+    \end{adjustwidth}%
+    \end{figure}%
+  }
+  \newenvironment{fullwidthtable}[1][htbp]{%
+    \begin{table}[#1]%
+    \begin{adjustwidth}{-\qtex@fullwidth@overhang}{-\qtex@fullwidth@overhang}%
+    \centering
+  }{%
+    \end{adjustwidth}%
+    \end{table}%
+  }
+\else
+  \newenvironment{fullwidth}{\begingroup}{\endgroup}
+\fi
+
+\newskip\qtex@newthoughtskip
+\setlength{\qtex@newthoughtskip}{0.8\baselineskip plus 0.5ex minus 0.2ex}
+\@ifundefined{textls}{%
+  \newcommand{\newthought}[1]{\par\vspace{\qtex@newthoughtskip}\noindent\textsc{#1}}%
+}{%
+  \newcommand{\newthought}[1]{\par\vspace{\qtex@newthoughtskip}\noindent\textls[50]{\scshape #1}}%
+}
+
+\setlength{\abovedisplayskip}{6pt plus 2pt minus 4pt}%
+\setlength{\belowdisplayskip}{6pt plus 2pt minus 4pt}%
+
+\renewcommand{\footnoterule}{%
+  \vspace*{4pt}%
+  \hrule width 0.4\columnwidth height 0.4pt
+  \vspace{4pt}%
+}
+
+% Metadata and license (shared by qbook and qarticle)
+\newcommand{\qtex@title}{}
+\newcommand{\qtex@author}{}
+\newcommand{\qtex@degree}{}
+\newcommand{\qtex@university}{Your University}
+\newcommand{\qtex@date}{\today}
+\renewcommand{\title}[1]{\gdef\qtex@title{#1}}
+\renewcommand{\author}[1]{\gdef\qtex@author{#1}}
+\newcommand{\degree}[1]{\gdef\qtex@degree{#1}}
+\newcommand{\university}[1]{\gdef\qtex@university{#1}}
+\renewcommand{\date}[1]{\gdef\qtex@date{#1}}
+\renewcommand{\today}{\number\day\ \ifcase\month\or
+  January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or December\fi
+  \ \number\year}
+\gdef\qtex@keywords{}%
+\newif\ifqtex@haskeywords
+\qtex@haskeywordsfalse
+\providecommand{\keywords}[1]{}%
+\renewcommand{\keywords}[1]{\gdef\qtex@keywords{#1}\ifstrempty{#1}{}{\qtex@haskeywordstrue}}
+
+\newif\ifqtex@license
+\qtex@licensefalse
+\gdef\qtex@licenseid{}%
+\gdef\qtex@copyrightholder{}%
+\gdef\qtex@licenseyear{}%
+\newcommand{\license}[1]{\qtex@licensetrue\gdef\qtex@licenseid{#1}}
+\newcommand{\copyrightholder}[1]{\gdef\qtex@copyrightholder{#1}}
+\newcommand{\licenseyear}[1]{\gdef\qtex@licenseyear{#1}}
+
+\def\qtex@setlicfrompair#1{\expandafter\qtex@setlicfrompair@aux#1}
+\def\qtex@setlicfrompair@aux#1#2{\gdef\qtex@lic@name{#1}\gdef\qtex@lic@url{#2}}
+\expandafter\def\csname qtex@lic@MIT\endcsname{{MIT License}{https://spdx.org/licenses/MIT.html}}
+\expandafter\def\csname qtex@lic@Apache-2.0\endcsname{{Apache License 2.0}{https://www.apache.org/licenses/LICENSE-2.0}}
+\expandafter\def\csname qtex@lic@GPL-3.0-only\endcsname{{GNU GPL License v3.0 only}{https://spdx.org/licenses/GPL-3.0-only.html}}
+\expandafter\def\csname qtex@lic@GPL-3.0-or-later\endcsname{{GNU GPL License v3.0 or later}{https://spdx.org/licenses/GPL-3.0-or-later.html}}
+\expandafter\def\csname qtex@lic@AGPL-3.0-only\endcsname{{GNU AGPL License v3.0 only}{https://spdx.org/licenses/AGPL-3.0-only.html}}
+\expandafter\def\csname qtex@lic@AGPL-3.0-or-later\endcsname{{GNU AGPL License v3.0 or later}{https://spdx.org/licenses/AGPL-3.0-or-later.html}}
+\expandafter\def\csname qtex@lic@GFDL-1.3\endcsname{{GNU Free Documentation License 1.3}{https://www.gnu.org/licenses/fdl-1.3.html}}
+\expandafter\def\csname qtex@lic@CC-BY-4.0\endcsname{{Creative Commons Attribution License 4.0}{https://creativecommons.org/licenses/by/4.0/legalcode}}
+\expandafter\def\csname qtex@lic@CC-BY-SA-4.0\endcsname{{Creative Commons Attribution-ShareAlike License 4.0}{https://creativecommons.org/licenses/by-sa/4.0/legalcode}}
+\expandafter\def\csname qtex@lic@CC-BY-NC-4.0\endcsname{{Creative Commons Attribution-NonCommercial License 4.0}{https://creativecommons.org/licenses/by-nc/4.0/legalcode}}
+\expandafter\def\csname qtex@lic@CC-BY-NC-SA-4.0\endcsname{{Creative Commons Attribution-NonCommercial-ShareAlike License 4.0}{https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode}}
+\expandafter\def\csname qtex@lic@CC-BY-NC-ND-4.0\endcsname{{Creative Commons Attribution-NonCommercial-NoDerivatives License 4.0}{https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode}}
+\expandafter\def\csname qtex@lic@CC-BY-ND-4.0\endcsname{{Creative Commons Attribution-NoDerivatives License 4.0}{https://creativecommons.org/licenses/by-nd/4.0/legalcode}}
+\expandafter\def\csname qtex@lic@CC0-1.0\endcsname{{CC0 1.0 Universal}{https://creativecommons.org/publicdomain/zero/1.0/legalcode}}
+\expandafter\def\csname qtex@lic@BSD-2-Clause\endcsname{{BSD 2-Clause ``Simplified'' License}{https://spdx.org/licenses/BSD-2-Clause.html}}
+\expandafter\def\csname qtex@lic@BSD-3-Clause\endcsname{{BSD 3-Clause ``New'' or ``Revised'' License}{https://spdx.org/licenses/BSD-3-Clause.html}}
+\expandafter\def\csname qtex@lic@LPPL-1.3c\endcsname{{LaTeX Project Public License 1.3c}{https://www.latex-project.org/lppl/lppl-1-3c.html}}
+
+\newcommand{\qtex@resolvelicense}{%
+  \edef\qtex@lic@curid{\qtex@licenseid}%
+  \edef\qtex@lic@cstest{qtex@lic@\qtex@lic@curid}%
+  \expandafter\@ifundefined\expandafter{\qtex@lic@cstest}{%
+    \gdef\qtex@lic@name{SPDX: \qtex@licenseid}%
+    \gdef\qtex@lic@url{https://spdx.org/licenses/\qtex@licenseid.html}%
+  }{%
+    \expandafter\qtex@setlicfrompair\csname qtex@lic@\qtex@lic@curid\endcsname
+  }%
+}
+
+\AtBeginDocument{%
+  \ifqtex@license
+    \InputIfFileExists{qtex-licenses.tex}{}{}%
+  \fi
+}
+
+% ------------------------------------------------------------------------------
+% Section/subsection formatting (titlesec) -- shared by qarticle and qbook
+% Tighter spacing for compact, Tufte-informed vertical rhythm.
+% (Skipped for slides: beamer handles its own sectioning.)
+% ------------------------------------------------------------------------------
+\ifqtex@slides\else
+\RequirePackage{titlesec}%
+\ifqtex@italic
+  \titleformat{\section}[hang]{\normalfont\Large\itshape}{\thesection}{1em}{}%
+  \titleformat{\subsection}[hang]{\normalfont\large\itshape}{\thesubsection}{1em}{}%
+  \titleformat{\subsubsection}[hang]{\normalfont\normalsize\itshape}{\thesubsubsection}{1em}{}%
+\else
+  \titleformat{\section}[hang]{\normalfont\Large\bfseries}{\thesection}{1em}{}%
+  \titleformat{\subsection}[hang]{\normalfont\large\bfseries}{\thesubsection}{1em}{}%
+  \titleformat{\subsubsection}[hang]{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}%
+\fi
+\titlespacing*{\section}{0pt}{2.5ex plus 0.8ex minus 0.3ex}{1.2ex plus 0.2ex}%
+\titlespacing*{\subsection}{0pt}{2.0ex plus 0.6ex minus 0.2ex}{0.8ex plus 0.1ex}%
+\titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.5ex minus 0.2ex}{0.5ex plus 0.1ex}%
+\ifqtex@parindent
+  \let\qtex@orig@afterheading\@afterheading
+  \renewcommand{\@afterheading}{%
+    \qtex@orig@afterheading
+    \noindent
+  }
+\fi
+\fi
+
+% ------------------------------------------------------------------------------
+% Page styles (fancyhdr) -- shared plain and empty styles for book and article.
+% Chapter-specific styles (plainchapter, chapter) remain in qbook.cls.
+% (Skipped for slides.)
+% ------------------------------------------------------------------------------
+\ifqtex@slides\else
+\RequirePackage{fancyhdr}
+\newlength{\qtex@headruleheight}
+\setlength{\qtex@headruleheight}{0.4pt}
+\def\qtex@dt@book{book}%
+\ifx\qtex@doctype\qtex@dt@book
+  \setlength{\headheight}{32pt}%
+  \addtolength{\topmargin}{-16pt}%
+\else
+  \setlength{\headheight}{15pt}%
+\fi
+
+\fancypagestyle{empty}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \ifqtex@twoside
+    \fancyhead[LE,RO]{\thepage}%
+    \fancyhead[LO,RE]{\textls[50]{\scshape\leftmark}}%
+  \else
+    \fancyhead[L]{\textls[50]{\scshape\leftmark}}%
+    \fancyhead[R]{\thepage}%
+  \fi
+  \renewcommand{\headrulewidth}{\qtex@headruleheight}%
+}
+\pagestyle{plain}
+\fi
+
+% ------------------------------------------------------------------------------
+% MakeUppercase suppression in running heads (Tufte: prefer small caps, not
+% ALL CAPS). Applied at \AtBeginDocument so base-class definitions exist.
+% ------------------------------------------------------------------------------
+\ifqtex@slides\else
+\AtBeginDocument{%
+  \def\qtex@dt@book{book}%
+  \ifx\qtex@doctype\qtex@dt@book
+    \@ifundefined{bibsection}{}{%
+      \renewcommand{\bibsection}{\chapter*{\bibname\@mkboth{\bibname}{\bibname}}}%
+    }%
+    \@ifundefined{thebibliography}{}{%
+      \patchcmd{\thebibliography}{\MakeUppercase\bibname}{\bibname}{}{}%
+      \patchcmd{\thebibliography}{\MakeUppercase\bibname}{\bibname}{}{}%
+    }%
+  \else
+    \@ifundefined{bibsection}{}{%
+      \renewcommand{\bibsection}{\section*{\refname\@mkboth{\refname}{\refname}}}%
+    }%
+    \@ifundefined{thebibliography}{}{%
+      \patchcmd{\thebibliography}{\MakeUppercase\refname}{\refname}{}{}%
+      \patchcmd{\thebibliography}{\MakeUppercase\refname}{\refname}{}{}%
+    }%
+  \fi
+}
+\fi
+
+% ------------------------------------------------------------------------------
+% Bibliography helper (\bib): shared style selection and license output.
+% Classes call \qtex@bib@setup then add class-specific structure.
+% ------------------------------------------------------------------------------
+\newcommand{\qtex@bib@selectstyle}{%
+  \ifqtex@cite@harvard
+    \bibliographystyle{agsm}%
+  \else
+    \bibliographystyle{plainnat}%
+  \fi
+}
+\renewcommand{\bibname}{References}
+
+\microtypesetup{final,protrusion=true,nopatch=footnote}%
+\ifXeTeX\else \microtypesetup{expansion=true}\fi
+
+\hypersetup{
+  unicode=true,
+  breaklinks=true,
+  colorlinks=true,
+  linkcolor=DarkBlue,
+  citecolor=DarkGreen,
+  urlcolor=DarkGreen,
+  filecolor=DarkBlue,
+  menucolor=DarkBlue
+}
+\let\qtex@orig@href\href
+\renewcommand{\href}[2]{%
+  \qtex@orig@href{#1}{{\color{DarkBlue}#2}}%
+}
+\def\UrlFont{\ttfamily\color{DarkGreen}}%
+
+\makeatother

@@ -1,0 +1,411 @@
+% Example document using qarticle class — comprehensive guide
+% Build from package root: make qarticle (or make)
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+%
+% This file demonstrates every qarticle / qtex feature and serves as a
+% compact user manual.  It is intentionally longer than a real paper so
+% that typography, line spacing, and page layout are visible.
+%
+% Class options (try uncommenting alternatives):
+%   Font:        sans (default) | serif | hacker
+%   Layout:      oneside (default) | twoside
+%   Citation:    numeric (default) | harvard
+%   Alignment:   raggedright (default) | justified
+%   Paragraph:   parskip (default) | parindent
+%   Line spacing: single (default) | onehalfspacing | linespread115 | linespread12
+%   Extras:      fullwidth, italic, obfuscate (LuaLaTeX)
+%TC:subst \string\ STR
+
+\documentclass[sans,oneside,numeric,raggedright]{qarticle}
+% \documentclass[serif,twoside,harvard,justified,parindent]{qarticle}
+% \documentclass[hacker,oneside,numeric,raggedright,fullwidth]{qarticle}
+
+\usepackage{lipsum}
+
+% --------------------------------------------------------------------------
+%  Metadata
+% --------------------------------------------------------------------------
+\title{The \texttt{qarticle} Class --- User Guide}
+
+\author{First Author}{%
+  Department of Computer Science, Example University;
+  E-mail: \url{first@example.org};
+  Homepage: \url{https://example.org/first};
+  ORCID: \url{https://orcid.org/0000-0001-2345-6789}}
+\author{Second Author}{%
+  Other Department, Other University;
+  E-mail: \url{second@example.org}}
+\author{Third Author}{%
+  Department of Computer Science, Example University;
+  E-mail: \url{third@example.org}}
+
+\license{LPPL-1.3c}
+\copyrightholder{First Author, Second Author, Third Author}
+\licenseyear{2026}
+
+\date{\today}
+\keywords{example, article, qtex, typography, acronyms, references, guide}
+
+\begin{document}
+
+% --------------------------------------------------------------------------
+%  Title and abstract
+% --------------------------------------------------------------------------
+\maketitle
+\begin{abstract}
+  This document is a comprehensive guide to the \texttt{qarticle} class,
+  which extends the standard \LaTeX{} \texttt{article} class with
+  typography, layout, citation, and metadata features shared across the
+  \texttt{qtex} package family.  It demonstrates every command and option
+  the class provides, serves as a visual reference for the resulting
+  layout, and includes lipsum text so that line spacing and paragraph
+  handling are apparent.
+\end{abstract}
+
+% ==========================================================================
+\section{Introduction}
+% ==========================================================================
+
+The \texttt{qarticle} class is part of the \texttt{qtex} family of \LaTeX{}
+classes.  It is section-based (no chapters or front/back matter) and is
+suitable for papers, short reports, and technical notes.
+
+This guide covers class options (\S\ref{sec:options}), metadata commands
+(\S\ref{sec:metadata}), typography (\S\ref{sec:typography}), content
+elements (\S\ref{sec:content}), citations and acronyms
+(\S\ref{sec:citations}), and the bibliography/license mechanism
+(\S\ref{sec:bibliography}).
+
+\lipsum[1]
+
+% ==========================================================================
+\section{Class Options}\label{sec:options}
+% ==========================================================================
+
+All options are passed to \texttt{qtex.sty}, which configures fonts,
+geometry, line spacing, and citation style.  The \texttt{\string\documentclass}
+line at the top of this file uses the defaults; commented-out alternatives
+show other combinations.
+
+\subsection{Font}
+
+Three font families are available:
+\begin{description}
+  \item[\texttt{sans}] Source Sans Pro (default).  Clean, modern sans-serif.
+  \item[\texttt{serif}] Source Serif Pro.  Traditional academic style.
+  \item[\texttt{hacker}] Inconsolata monospaced.  Terminal aesthetic.
+\end{description}
+
+\subsection{Layout and alignment}
+
+\begin{description}
+  \item[\texttt{oneside} / \texttt{twoside}] Single- or double-sided page
+    layout.  Affects header placement and margin mirroring.
+  \item[\texttt{raggedright} / \texttt{justified}] Left-aligned (default) or
+    fully justified text.  Ragged right avoids rivers and improves
+    readability at narrow line widths.
+  \item[\texttt{parskip} / \texttt{parindent}] Paragraph separation by
+    vertical space (default) or by first-line indent.
+  \item[\texttt{fullwidth}] Extends figures and tables into the margin via
+    \texttt{fullwidth}, \texttt{fullwidthfigure}, and
+    \texttt{fullwidthtable} environments.
+  \item[\texttt{italic}] Section headings use italic instead of bold;
+    captions also use italic.
+\end{description}
+
+\subsection{Line spacing}
+
+\begin{description}
+  \item[\texttt{single}] Default single spacing.
+  \item[\texttt{onehalfspacing}] 1.5 line spacing (via \texttt{setspace}).
+  \item[\texttt{linespread115}] \texttt{\string\linespread\{1.15\}}.
+  \item[\texttt{linespread12}] \texttt{\string\linespread\{1.2\}}.
+\end{description}
+
+\subsection{Citation style}
+
+\begin{description}
+  \item[\texttt{numeric}] Numeric citations with square brackets (default):
+    \texttt{[1]}, \texttt{[2, 3]}.
+  \item[\texttt{harvard}] Author-year citations with round brackets:
+    \texttt{(Author, 2024)}.
+\end{description}
+
+\subsection{Obfuscation (LuaLaTeX only)}
+
+\begin{description}
+  \item[\texttt{noobfuscate}] Normal fonts (default).
+  \item[\texttt{obfuscate}] Scrambles glyph mappings for blind review;
+    requires \texttt{lualatex} and pre-built obfuscated fonts.
+\end{description}
+
+% ==========================================================================
+\section{Metadata Commands}\label{sec:metadata}
+% ==========================================================================
+
+\subsection{Title, authors, and date}
+
+\begin{itemize}
+  \item \verb|\title{...}| --- document title.
+  \item \verb|\author{Name}{Details}| --- call once per author.  \texttt{Name}
+    appears under the title; \texttt{Details} (institution, e-mail, URL,
+    ORCID) are printed by \verb|\printauthors| (see \S\ref{sec:authors}).
+  \item \verb|\date{...}| --- date line; \verb|\today| produces the current
+    date in ``day Month year'' format.
+\end{itemize}
+
+\subsection{Keywords}
+
+\verb|\keywords{word1, word2, ...}| populates the keyword line inside the
+abstract box.  If no keywords are set, the line is omitted.
+
+\subsection{License and copyright}
+
+\begin{itemize}
+  \item \verb|\license{SPDX-ID}| --- enables the license section before the
+    bibliography.  Recognised SPDX identifiers are resolved to full names
+    and URLs automatically.
+  \item \verb|\copyrightholder{Name(s)}| --- copyright holder(s); defaults
+    to the first \verb|\author| name.
+  \item \verb|\licenseyear{YYYY}| --- copyright year; defaults to the
+    current year.
+\end{itemize}
+
+% ==========================================================================
+\section{Typography}\label{sec:typography}
+% ==========================================================================
+
+\subsection{New thought}
+
+\newthought{New thoughts} begin a paragraph with letterspaced small caps,
+inspired by Tufte's typographic style.  The command is
+\verb|\newthought{text}| and inserts a vertical skip before the paragraph.
+
+\lipsum[2]
+
+\subsection{Epigraph}
+
+An epigraph is a short quotation placed flush-right, typically at the start
+of a section:
+
+\epigraph{The art of typography is the art of arranging type.}{Stanley Morison}
+
+\lipsum[3]
+
+\subsection{Links and URLs}
+
+Hyperlinks use \texttt{DarkBlue}: \href{https://qyber.black/}{Qyber}.
+URLs and citations use \texttt{DarkGreen}: \url{https://langbein.org/}.
+The colours are set by \texttt{qtex.sty} via \texttt{hyperref}.
+
+\subsection{Footnotes}
+
+Footnotes\footnote{This is a footnote demonstrating the thin rule and
+compact spacing.} use a 40\% column-width rule and compact spacing.
+
+\lipsum[4]
+
+% ==========================================================================
+\section{Content Elements}\label{sec:content}
+% ==========================================================================
+
+\subsection{Lists}
+
+\subsubsection{Itemize (3 nesting levels)}
+
+\begin{itemize}
+  \item First item
+    \begin{itemize}
+      \item Sub-item one
+      \item Sub-item two
+        \begin{itemize}
+          \item Sub-sub-item
+        \end{itemize}
+    \end{itemize}
+  \item Second item
+  \item Third item
+\end{itemize}
+
+\subsubsection{Enumerate}
+
+\begin{enumerate}
+  \item Step one
+    \begin{enumerate}
+      \item Sub-step A
+      \item Sub-step B
+        \begin{enumerate}
+          \item Detail
+        \end{enumerate}
+    \end{enumerate}
+  \item Step two
+  \item Step three
+\end{enumerate}
+
+\subsubsection{Description}
+
+\begin{description}
+  \item[Term A] Definition of term A.
+  \item[Term B] Definition of term B.
+  \item[Term C] A longer definition that wraps across multiple lines to
+    show how the hanging indent behaves with the compact margins configured
+    by \texttt{qtex.sty}.
+\end{description}
+
+\subsection{Mathematics}
+
+Inline: $E = mc^2$, and $\sum_{k=0}^{n}\binom{n}{k} = 2^n$.
+
+Display (unnumbered):
+\begin{displaymath}
+  \oint_C \mathbf{F}\cdot\mathrm{d}\mathbf{r}
+  = \iint_S (\nabla\times\mathbf{F})\cdot\mathrm{d}\mathbf{S}
+\end{displaymath}
+
+Numbered equation:
+\begin{equation}\label{eq:gauss}
+  \nabla\cdot\mathbf{E} = \frac{\rho}{\varepsilon_0}
+\end{equation}
+
+Aligned equations:
+\begin{align}
+  f(x) &= x^2 + 2x + 1 \label{eq:expand}\\
+       &= (x+1)^2       \label{eq:factor}
+\end{align}
+
+See Equation~\eqref{eq:gauss} for Gauss's law and
+Equations~\eqref{eq:expand}--\eqref{eq:factor} for the factored form.
+
+\subsection{Figures}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.6\linewidth]{example-image-a}
+  \caption{A placeholder figure.  Captions use \texttt{\string\small} font
+    size.  With the \texttt{italic} option, both label and text are
+    italicised.}
+  \label{fig:example}
+\end{figure}
+
+See Figure~\ref{fig:example} for the placeholder image.
+
+\subsection{Tables}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Summary of experimental runs.}\label{tab:summary}
+  \begin{tabular}{lccc}
+    \hline
+    Run      & Mean & Std.\ dev. & $n$ \\
+    \hline
+    Baseline & 1.20 & 0.10 & 50 \\
+    Var.\ A  & 1.52 & 0.21 & 50 \\
+    Var.\ B  & 1.08 & 0.15 & 50 \\
+    Var.\ C  & 1.34 & 0.18 & 50 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:summary} summarises the results.
+
+\lipsum[5]
+
+\subsection{Verse and quotation}
+
+\begin{verse}
+  Shall I compare thee to a summer's day?\\
+  Thou art more lovely and more temperate.
+\end{verse}
+
+\begin{quotation}
+  Typography is a beautiful group of letters, not a group of beautiful
+  letters. --- Matthew Carter
+\end{quotation}
+
+\begin{quote}
+  Short quotes use the \texttt{quote} environment.
+\end{quote}
+
+% ==========================================================================
+\section{Citations and Acronyms}\label{sec:citations}
+% ==========================================================================
+
+\subsection{Citations}
+
+Use \verb|\citep{key}| for parenthetical citations: \citep{example-book},
+and \verb|\citet{key}| for textual citations: \citet{example-paper}.
+Multiple keys: \citep{example-book,example-conf}.
+
+Bare \verb|\cite{key}| emits a warning and falls back to \verb|\citep|:
+always prefer the explicit form.
+
+\subsection{Acronyms}\label{sec:acronyms}
+
+Acronyms are managed via the \texttt{glossaries} package.  Define them in
+\texttt{acronyms.tex} (auto-loaded) or override the file name:
+
+\noindent\verb|\renewcommand{\qtexacronymfile}{yourfile.tex}|
+
+First use expands the acronym: \gls{cc}.  Second use abbreviates: \gls{cc}.
+Plural: \glspl{api}.  The acronym list is printed with
+\verb|\printglossary[type=\acronymtype]|.
+
+% ==========================================================================
+\section{Discussion}\label{sec:discussion}
+% ==========================================================================
+
+\lipsum[6-7]
+
+The results align with earlier work~\citep{example-book,example-paper}.
+Future work could extend the \gls{api} and add more comparisons
+\citep{example-conf}.
+
+% ==========================================================================
+\section{Conclusion}
+% ==========================================================================
+
+This guide demonstrated every feature of the \texttt{qarticle} class:
+metadata and license commands, multi-author support, abstract with keywords,
+typography helpers (\verb|\newthought|, \verb|\epigraph|), lists,
+mathematics, figures, tables, citations (numeric and harvard), acronyms,
+and the bibliography/license output.
+
+\lipsum[8]
+
+% ==========================================================================
+%  Back matter
+% ==========================================================================
+
+\section*{Data Availability}
+
+The data used in this example is synthetic.  In a real paper, describe
+where the data is stored, under what license it is released, and how
+readers can access it.
+
+\section*{Code Availability}
+
+The code used to generate these results is part of the \texttt{qtex}
+package repository.  In a real paper, link to a public source code
+repository, specify the license, and indicate the version or commit hash.
+
+\section*{Ethical Statement}
+
+This example does not involve human or animal subjects.  For real work,
+describe ethics approvals, informed consent, and harm mitigation.
+
+% --------------------------------------------------------------------------
+%  Authors section
+% --------------------------------------------------------------------------
+\printauthors
+
+% --------------------------------------------------------------------------
+%  Acronym list
+% --------------------------------------------------------------------------
+\printglossary[type=\acronymtype]
+
+% --------------------------------------------------------------------------
+%  Bibliography (with automatic License section when \license{...} is set)
+% --------------------------------------------------------------------------
+\label{sec:bibliography}%
+\bib{bibliography}
+\end{document}

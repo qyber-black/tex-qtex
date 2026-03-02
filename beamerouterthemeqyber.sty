@@ -1,0 +1,95 @@
+% beamerouterthemeqyber.sty -- Qyber beamer outer theme
+%
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+
+\mode<presentation>
+
+% Option to enable video footer mode
+\newif\ifbarfooter
+\barfooterfalse
+
+% Theme options (header is default)
+\DeclareOptionBeamer{header}{\barfooterfalse}
+\DeclareOptionBeamer{footer}{\barfootertrue}
+
+% Process options
+\ProcessOptionsBeamer
+
+% Command to enable video footer (for backward compatibility)
+\newcommand{\enablefooter}{\barfootertrue}
+
+% Header/footer URLs in the right-hand box (one per line, use \\).
+\newcommand{\qyberurls}{\url{https://qyber.black/}}
+\newcommand{\setqyberurls}[1]{\renewcommand{\qyberurls}{#1}}
+
+% Author URL shown next to the short author name in the header/footer bar.
+% Default: empty (plain text). Set with \setqyberauthorurl{https://...}.
+\newcommand{\qyber@authorurl}{}
+\newcommand{\setqyberauthorurl}[1]{\renewcommand{\qyber@authorurl}{#1}}
+
+% Bar height (qslides sets 12pt/16pt-specific values; default for standalone theme)
+\providecommand{\qyber@barheight}{.1\paperheight}
+
+% Frame title (top header bar)
+\defbeamertemplate*{frametitle}{qyber}[1][]{
+  \ifbarfooter
+    % In video footer mode, don't show the top header
+  \else
+    \vskip2pt\hskip-\beamer@leftmargin\begin{beamercolorbox}[wd=.8\paperwidth,ht=\qyber@barheight]{frametitle}
+    \begin{tikzpicture}
+    \useasboundingbox[fill=bg_header_bar_col](0,0) rectangle(.8\paperwidth,\qyber@barheight);
+    \fill[bg_header_bar_col] (0,0) rectangle(.8\paperwidth,\qyber@barheight);
+    \ifx\insertframesubtitle\@empty%
+      {\node[anchor=west,fg_head_col,font=\Large] at (0.1,0.49){\insertframetitle};}
+    \else%
+      {\node[anchor=west,fg_head_col,font=\large] at (0.1,0.65){\insertframetitle};%
+       \node[anchor=west,fg_head_col,font=\scriptsize] at (0.1,0.2){\insertframesubtitle};}%
+    \fi
+    \fill[fg_head_col] (.8\paperwidth,0) rectangle(.79\paperwidth,\qyber@barheight);
+    % Right-hand box: use slide background (bg_page_col) behind URL/author
+    \useasboundingbox[fill=bg_page_col](.8\paperwidth,0) rectangle(\paperwidth,\qyber@barheight);
+    \node[anchor=east,fg_body_col,font=\scriptsize] at (\paperwidth,0.8){\normalfont\insertframenumber{} / \inserttotalframenumber};
+    \node[anchor=east,fg_body_col,font=\tiny] at (\paperwidth,0.35){%
+      \ifx\qyber@authorurl\@empty\insertshortauthor\else\href{\qyber@authorurl}{\insertshortauthor}\fi};
+    % URLs: align baseline of lowest line with bar bottom
+    \node[anchor=base east,fg_body_col,font=\tiny,align=right] at (\paperwidth,0){\qyberurls};
+    \end{tikzpicture}
+    \end{beamercolorbox}
+    \vskip-3pt
+  \fi
+}
+
+% Footline (bottom header bar for video footer mode)
+\setbeamertemplate{footline}{
+  \ifbarfooter
+    \ifnum\thepage>1\relax%
+      \leavevmode%
+      \vskip-50pt\hbox{%
+        \hskip-\beamer@leftmargin\begin{beamercolorbox}[wd=.8\paperwidth,ht=\qyber@barheight,dp=0pt]{frametitle}%
+          \begin{tikzpicture}
+          \useasboundingbox[fill=bg_header_bar_col](0,0) rectangle(.8\paperwidth,\qyber@barheight);
+          \fill[bg_header_bar_col] (0,0) rectangle(.8\paperwidth,\qyber@barheight);
+          \ifx\insertframesubtitle\@empty%
+            {\node[anchor=west,fg_head_col,font=\Large] at (0.1,0.49){\insertframetitle};}
+          \else%
+            {\node[anchor=west,fg_head_col,font=\large] at (0.1,0.65){\insertframetitle};%
+             \node[anchor=west,fg_head_col,font=\scriptsize] at (0.1,0.2){\insertframesubtitle};}%
+          \fi
+          \fill[fg_head_col] (.8\paperwidth,0) rectangle(.79\paperwidth,\qyber@barheight);
+          % Right-hand box in footer: slide background behind URL/author
+          \useasboundingbox[fill=bg_page_col](.8\paperwidth,0) rectangle(\paperwidth,\qyber@barheight);
+          \node[anchor=east,fg_body_col,font=\scriptsize] at (\paperwidth,0.8){\normalfont\insertframenumber{} / \inserttotalframenumber};
+          \node[anchor=east,fg_body_col,font=\tiny] at (\paperwidth,0.35){%
+            \ifx\qyber@authorurl\@empty\insertshortauthor\else\href{\qyber@authorurl}{\insertshortauthor}\fi};
+          % URLs: align baseline of lowest line with bar bottom
+          \node[anchor=base east,fg_body_col,font=\tiny,align=right] at (\paperwidth,0){\qyberurls};
+          \end{tikzpicture}
+        \end{beamercolorbox}%
+      }\vskip2pt%
+    \fi%
+  \fi%
+}
+
+\mode<all>
+

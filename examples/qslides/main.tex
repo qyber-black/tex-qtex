@@ -1,0 +1,917 @@
+% Example document using qslides class — comprehensive guide
+% Build from package root: make qslides  or  latexmk -pdf tex-qtex/examples/qslides/main.tex
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+%
+% This example serves as a compact guide to qslides-specific features and
+% standard beamer capabilities rendered with the Qyber theme.
+%
+% Class options used here: sans, numeric, titlesplit.
+% Other useful options (try uncommenting):
+%   Font:        serif, hacker
+%   Title page:  titlebasic (default), titlesplit
+%   Size:        large (17pt body; bars scale)
+%   Citation:    harvard (author-year)
+%   Other:       italic, obfuscate (LuaLaTeX blind review)
+%   Beamer pass: aspectratio=43, handout, notes
+%TC:subst \string\ STR
+
+\documentclass[sans,numeric,titlesplit]{qslides}
+
+\title{Qyber Slides --- Compact Guide}
+\subtitle{qslides class \& Beamer features}
+\titlebox{%
+  \centerline{\includegraphics[width=.5\linewidth]{example-image-a}}
+  \smallskip
+  The \texttt{qslides} class extends Beamer with the Qyber dark theme,
+  custom blocks, layout helpers, and footer-based citations.
+}
+\author{Author Name}
+\date{\today}
+\copyrightholder{Frank Langbein}
+\licenseyear{2026}
+\license{LPPL-1.3c}
+\slidesurls{\url{https://qyber.black/}\\\url{https://langbein.org/}}
+\setqyberauthorurl{https://langbein.org/}
+\slidesbib{refs}
+
+\begin{document}
+
+% ==========================================================================
+%  TITLE AND OVERVIEW
+% ==========================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\section{Overview}
+
+\begin{frame}{Overview}
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \tableofcontents[sections={1-9}]
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \tableofcontents[sections={10-17}]
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ==========================================================================
+%  PART I — QSLIDES-SPECIFIC FEATURES
+% ==========================================================================
+
+\section{Title Page}
+
+\begin{frame}{Title page variants}
+  \framesubtitle{Class options \texttt{titlebasic} (default) and \texttt{titlesplit}}
+  \begin{twocolumns}[t]
+    \begin{leftcolumn}
+      \begin{block}{\texttt{titlebasic}}
+        Red header bar with title/subtitle, centred author and date below.
+        Optional \texttt{\string\titlegraphic} above the bar.
+      \end{block}
+    \end{leftcolumn}
+    \begin{rightcolumn}
+      \begin{block}{\texttt{titlesplit}}
+        Red header bar, then a two-column split: left for
+        \texttt{\string\titlebox\{...\}} content (image, highlights),
+        right for author and date.
+      \end{block}
+    \end{rightcolumn}
+  \end{twocolumns}
+  \vspace{1ex}
+  \begin{codeblock}{Preamble for split title}
+    \texttt{\string\documentclass[titlesplit]\{qslides\}}\\
+    \texttt{\string\titlebox\{\string\includegraphics[width=.5\string\linewidth]\{img\}  Some text.\}}
+  \end{codeblock}
+\end{frame}
+
+\begin{frame}{License footer on title page}
+  \framesubtitle{\texttt{\string\license}, \texttt{\string\copyrightholder}, \texttt{\string\licenseyear}}
+  When \texttt{\string\license\{SPDX-ID\}} is set, a thin footer bar appears at the
+  bottom of the title page with copyright and license information.
+
+  Supported SPDX identifiers include MIT, Apache-2.0, GPL-3.0-only, CC-BY-4.0,
+  LPPL-1.3c, and many more (see \texttt{qtex.sty}).
+  \begin{codeblock}{Example}
+    \texttt{\string\license\{LPPL-1.3c\}}\\
+    \texttt{\string\copyrightholder\{Frank Langbein\}}\\
+    \texttt{\string\licenseyear\{2026\}}
+  \end{codeblock}
+\end{frame}
+
+\section{Preamble Commands}
+
+\begin{frame}{Preamble commands}
+  \framesubtitle{URLs, author link, bibliography}
+  \begin{block}{\texttt{\string\slidesurls\{\string\url\{...\}\}}}
+    Sets the URLs displayed in the header/footer right-hand box. Separate
+    multiple URLs with \texttt{\string\\}.
+  \end{block}
+  \begin{block}{\texttt{\string\setqyberauthorurl\{https://...\}}}
+    Makes the short author name in the header bar a clickable link.
+  \end{block}
+  \begin{block}{\texttt{\string\slidesbib\{refs\}}}
+    Registers a \texttt{.bib} file.  Citations via
+    \texttt{\string\citep}/\texttt{\string\citet} show the full reference
+    in a footer bar (via \texttt{\string\bibentry}).
+  \end{block}
+\end{frame}
+
+\section{Emphasis \& Colours}
+
+\begin{frame}{Emphasis and text colours}
+  \framesubtitle{\texttt{\string\emph}, \texttt{\string\hi}, \texttt{\string\alert}}
+  \begin{itemize}
+    \item \emph{Emphasis} uses \texttt{fg\_emph\_col} (green).
+      Syntax: \texttt{\string\emph\{text\}}.
+    \item \hi{Highlight} uses \texttt{fg\_highlight\_col} as background
+      with \texttt{fg\_body\_col} (white) text.
+      Syntax: \texttt{\string\hi\{text\}}.
+    \item \alert{Alert} uses \texttt{fg\_highlight\_col} for the text colour.
+      Syntax: \texttt{\string\alert\{text\}} (standard Beamer).
+  \end{itemize}
+  \vspace{1ex}
+  Links: \href{https://qyber.black/}{Qyber} uses \texttt{fg\_link\_col} (blue).
+  \url{https://langbein.org/} uses \texttt{fg\_ref\_col} (green).
+\end{frame}
+
+\begin{frame}{Colour palette --- backgrounds}
+  \framesubtitle{Named \texttt{bg\_*\_col} colours used by blocks, bars, and page}
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \textbf{Core backgrounds}\\[0.5ex]
+      \colorbox{bg_page_col}{\color{fg_body_col}\strut\hspace{0.9em}}\ \texttt{bg\_page\_col}\\[0.3ex]
+      \colorbox{bg_surface_col}{\color{fg_body_col}\strut\hspace{0.9em}}\ \texttt{bg\_surface\_col}\\[0.3ex]
+      \colorbox{bg_header_col}{\color{fg_body_col}\strut\hspace{0.9em}}\ \texttt{bg\_header\_col}\\[0.3ex]
+      \colorbox{bg_highlight_col}{\color{fg_body_col}\strut\hspace{0.9em}}\ \texttt{bg\_highlight\_col}\\[0.3ex]
+      \colorbox{bg_video_col}{\color{fg_body_col}\strut\hspace{0.9em}}\ \texttt{bg\_video\_col}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \textbf{Block backgrounds}\\[0.5ex]
+      \colorbox{bg_info_col}{\color{fg_body_col}\strut\ info\hspace{0.5em}}\ \texttt{bg\_info\_col}\\[0.3ex]
+      \colorbox{bg_error_col}{\color{fg_body_col}\strut\ error\hspace{0.5em}}\ \texttt{bg\_error\_col}\\[0.3ex]
+      \colorbox{bg_example_col}{\color{fg_body_col}\strut\ example\hspace{0.5em}}\ \texttt{bg\_example\_col}\\[0.3ex]
+      \colorbox{bg_code_col}{\color{fg_body_col}\strut\ code\hspace{0.5em}}\ \texttt{bg\_code\_col}\\[0.3ex]
+      \colorbox{bg_result_col}{\color{fg_body_col}\strut\ result\hspace{0.5em}}\ \texttt{bg\_result\_col}\\[0.3ex]
+      \colorbox{bg_success_col}{\color{fg_body_col}\strut\ success\hspace{0.5em}}\ \texttt{bg\_success\_col}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Colour palette --- foregrounds \& accents}
+  \framesubtitle{Named \texttt{fg\_*\_col} and \texttt{ac\_*\_col} colours}
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \textbf{Text foregrounds}\\[0.5ex]
+      {\color{fg_body_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_body\_col} (white)\\[0.3ex]
+      {\color{fg_head_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_head\_col} (gold)\\[0.3ex]
+      {\color{fg_footer_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_footer\_col} (grey)\\[0.3ex]
+      {\color{fg_highlight_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_highlight\_col} (orange)\\[0.3ex]
+      {\color{fg_emph_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_emph\_col} (green)\\[0.3ex]
+      {\color{fg_header_bar_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_header\_bar\_col}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \textbf{Links}\\[0.5ex]
+      {\color{fg_link_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_link\_col} (blue)\\[0.3ex]
+      {\color{fg_ref_col}\rule{0.9em}{1.2ex}}\ \texttt{fg\_ref\_col} (green)\\[1.5ex]
+      \textbf{Accents}\\[0.5ex]
+      {\color{ac_rule_col}\rule{0.9em}{1.2ex}}\ \texttt{ac\_rule\_col} (bright green)\\[0.3ex]
+      {\color{ac_en_symbol_col}\rule{0.9em}{1.2ex}}\ \texttt{ac\_en\_symbol\_col} (purple)
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Blocks}
+
+\begin{frame}{Blocks (6 types, with header)}
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \begin{block}{Info block}
+        \texttt{block}: definitions (cyan).
+      \end{block}
+      \begin{alertblock}{Error block}
+        \texttt{alertblock}: errors (red).
+      \end{alertblock}
+      \begin{exampleblock}{Example block}
+        \texttt{exampleblock}: examples (violet).
+      \end{exampleblock}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \begin{codeblock}{Code block}
+        \texttt{codeblock}: code (blue).
+      \end{codeblock}
+      \begin{resultblock}{Result block}
+        \texttt{resultblock}: results (olive).
+      \end{resultblock}
+      \begin{successblock}{Success block}
+        \texttt{successblock}: success (green).
+      \end{successblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Blocks without header}
+  \framesubtitle{Empty title: \texttt{\string\begin\{block\}\{\string\}\string\end\{block\}}}
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \begin{block}{}
+        \texttt{block}\{\}: info (cyan).
+      \end{block}
+      \begin{alertblock}{}
+        \texttt{alertblock}\{\}: error (red).
+      \end{alertblock}
+      \begin{exampleblock}{}
+        \texttt{exampleblock}\{\}: example (violet).
+      \end{exampleblock}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \begin{codeblock}{}
+        \texttt{codeblock}\{\}: code (blue).
+      \end{codeblock}
+      \begin{resultblock}{}
+        \texttt{resultblock}\{\}: result (olive).
+      \end{resultblock}
+      \begin{successblock}{}
+        \texttt{successblock}\{\}: success (green).
+      \end{successblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Layout Helpers}
+
+\begin{frame}{Lists}
+  \framesubtitle{Itemize and enumerate (3 nesting levels)}
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \textbf{Itemize}
+      \begin{itemize}
+        \item First bullet
+          \begin{itemize}
+            \item Subitem 1
+            \item Subitem 2
+          \end{itemize}
+        \item Second bullet
+        \item Third bullet
+          \begin{itemize}
+            \item Subitem 1
+              \begin{itemize}
+                \item Subsubitem 1
+                \item Subsubitem 2
+              \end{itemize}
+            \item Subitem 2
+          \end{itemize}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \textbf{Enumerate}
+      \begin{enumerate}
+        \item First step
+          \begin{enumerate}
+            \item Substep 1
+            \item Substep 2
+          \end{enumerate}
+        \item Second step
+        \item Third step
+          \begin{enumerate}
+            \item Substep 1
+              \begin{enumerate}
+                \item Subsubstep 1
+                \item Subsubstep 2
+              \end{enumerate}
+          \end{enumerate}
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Headerless boxes (\texttt{slidebox})}
+  \framesubtitle{\texttt{slidebox} and \texttt{slidebox[border]}}
+  Content-only boxes with no header bar. Optional thin border.
+  \begin{slidebox}
+    \textbf{No border} --- normal text colours, no semantic colouring.
+    Use for grouping related content.
+    Syntax: \texttt{slidebox} environment.
+  \end{slidebox}
+  \begin{slidebox}[border]
+    \textbf{With border} --- same style plus a thin rule.
+    Useful for call-outs or framing important text.
+    Syntax: \texttt{slidebox} with \texttt{[border]} option.
+  \end{slidebox}
+\end{frame}
+
+\begin{frame}{Two-column slide}
+  \framesubtitle{\texttt{twocolumns}, \texttt{leftcolumn}, \texttt{rightcolumn}}
+  \begin{twocolumns}[t]
+    \begin{leftcolumn}
+      \textbf{Left column}
+      \begin{itemize}
+        \item First point
+        \item Second point
+        \item Third point
+      \end{itemize}
+    \end{leftcolumn}
+    \begin{rightcolumn}
+      \textbf{Right column}
+      \begin{itemize}
+        \item Another point
+        \item Final point
+        \item One more
+      \end{itemize}
+    \end{rightcolumn}
+  \end{twocolumns}
+  \vspace{1ex}
+  Alignment options: \texttt{[t]} top, \texttt{[c]} centre, \texttt{[b]} bottom.
+  Each column is 48\% of \texttt{\string\linewidth}.
+\end{frame}
+
+\begin{frame}{Two columns as part of a slide}
+  \framesubtitle{Blocks inside columns; intro text above}
+  Intro text above the columns shows that \texttt{twocolumns} can share
+  the slide with other content.
+  \begin{twocolumns}[t]
+    \begin{leftcolumn}
+      \begin{block}{Left block}
+        Content in the left column inside a standard info block.
+      \end{block}
+    \end{leftcolumn}
+    \begin{rightcolumn}
+      \begin{codeblock}{Right block}
+        Content in the right column inside a code block.
+      \end{codeblock}
+    \end{rightcolumn}
+  \end{twocolumns}
+\end{frame}
+
+\begin{frame}{Centred column alignment}
+  \begin{twocolumns}[c]
+    \begin{leftcolumn}
+      Short left text.\\
+      Another line.\\
+      Another line.\\
+      Another line.\\
+      Another line.
+    \end{leftcolumn}
+    \begin{rightcolumn}
+      Short right text; columns are vertically centred.
+    \end{rightcolumn}
+  \end{twocolumns}
+\end{frame}
+
+\begin{frame}{Placed boxes (relative coordinates)}
+  \framesubtitle{\texttt{\string\placebox\{x\}\{y\}\{w\}\{h\}\{content\}}}
+  Position and size in $[0,1]$ relative to the text area. $(0,0)$ = bottom-left.
+  \placebox{0.05}{0.0}{0.4}{0.3}{%
+    \begin{block}{Bottom-left}
+      At $(0.05, 0.0)$, size $0.4 \times 0.3$.
+  \end{block}}%
+  \placebox{0.55}{0.15}{0.4}{0.35}{%
+    \begin{codeblock}{Right side}
+      At $(0.55, 0.15)$, size $0.4 \times 0.35$.
+  \end{codeblock}}%
+  \placebox{0.25}{0.55}{0.5}{0.2}{%
+    \begin{exampleblock}{Centre}
+      Overlapping boxes are drawn in source order.
+  \end{exampleblock}}%
+\end{frame}
+
+\begin{frame}{Placed box with optional anchor}
+  \framesubtitle{\texttt{\string\placebox[anchor]\{x\}\{y\}\{w\}\{h\}\{content\}}}
+  The default anchor is \texttt{south west}.  With \texttt{[north east]},
+  the given $(x,y)$ is the top-right corner of the box.
+  \placebox[north east]{0.95}{0.85}{0.45}{0.25}{%
+    \begin{block}{Top-right anchored}
+      Anchored \texttt{north east} at $(0.95, 0.85)$.
+  \end{block}}%
+  \placebox{0.05}{0.05}{0.45}{0.25}{%
+    \begin{resultblock}{Bottom-left (default)}
+      Anchored \texttt{south west} at $(0.05, 0.05)$.
+  \end{resultblock}}%
+\end{frame}
+
+\section{Video Layouts}
+
+\begin{frame}{Video layout modes}
+  \framesubtitle{Five background templates for video-integrated presentations}
+  The Qyber theme provides five layout modes for slides that include a
+  video area (displayed as \texttt{bg\_video\_col}).
+  \begin{description}
+    \item[\texttt{full}] Default; content fills the entire slide.
+    \item[\texttt{left}] Content left (60\%), video right (40\%).
+    \item[\texttt{right}] Video left (40\%), content right (60\%).
+    \item[\texttt{corner}] Small video in one corner (25\%$\times$25\%).
+    \item[\texttt{overlay}] Full-slide video background, content overlay box.
+  \end{description}
+\end{frame}
+
+\begin{frame}{Video layout commands}
+  \framesubtitle{Selecting layout, corner side, and video colour}
+  \begin{codeblock}{Setting the layout}
+    \texttt{\string\setbeamertemplate\{background\}[layoutleft]}\\
+    \texttt{\string\setbeamertemplate\{background\}[layoutcorner]}\\
+    \texttt{\string\setbeamertemplate\{background\}[layoutfull]}
+  \end{codeblock}
+  \begin{codeblock}{Corner side and video colour}
+    \texttt{\string\setcornerleft}\ \ or\ \ \texttt{\string\setcornerright}\\[0.5ex]
+    \texttt{\string\setvideocolor\{0.0,0.2,0.8\}}
+  \end{codeblock}
+  Reset to normal with \texttt{[layoutfull]} after the video section.
+\end{frame}
+
+\begin{frame}{Left split layout}
+  \setbeamertemplate{background}[layoutleft]
+  \framesubtitle{Content area left (60\%), video area right (40\%)}
+  This slide uses \texttt{[layoutleft]}.
+  The dark area on the right would contain
+  a video feed in a live presentation.
+  \begin{itemize}
+    \item Content stays in the left 60\%.
+    \item The header bar spans the content area only.
+    \item Reset with \texttt{[layoutfull]}.
+  \end{itemize}
+\end{frame}
+
+\setbeamertemplate{background}[layoutfull]
+
+\begin{frame}{Footer bar mode}
+  \framesubtitle{\texttt{\string\enablefooter} moves the header bar to the bottom}
+  Normally the red title bar is at the top (\texttt{header} mode, default).
+  Calling \texttt{\string\enablefooter} switches to \texttt{footer} mode:
+  the bar moves to the bottom, freeing the top for full-bleed content.
+  \begin{codeblock}{Usage}
+    \texttt{\string\enablefooter}\\
+    \texttt{\string\begin\{frame\}\{Title\}}\\
+    \texttt{\ \ Content above the bottom bar.}\\
+    \texttt{\string\end\{frame\}}
+  \end{codeblock}
+\end{frame}
+
+\section{Class Options}
+
+\begin{frame}{Class options summary}
+  \framesubtitle{All options for \texttt{\string\documentclass[...]\{qslides\}}}
+  \small
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \begin{block}{Font}
+        \texttt{sans} (default), \texttt{serif}, \texttt{hacker}
+      \end{block}
+      \begin{block}{Title page}
+        \texttt{titlebasic} (default), \texttt{titlesplit}
+      \end{block}
+      \begin{block}{Size}
+        12pt default; \texttt{large} = 17pt
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \begin{block}{Citation}
+        \texttt{numeric} (default), \texttt{harvard}
+      \end{block}
+      \begin{block}{Other qtex options}
+        \texttt{italic}, \texttt{obfuscate},\\
+        \texttt{parskip}/\texttt{parindent},\\
+        \texttt{single}/\texttt{onehalfspacing}
+      \end{block}
+      \begin{block}{Beamer pass-through}
+        \texttt{aspectratio=43}, \texttt{handout},\\
+        \texttt{notes}, any Beamer option.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Footnotes \& Citations}
+
+\begin{frame}{Footnotes}
+  \framesubtitle{\texttt{\string\footnote\{...\}} renders in a TikZ-overlay footer bar}
+  Footnotes appear as \texttt{[N]} markers in the text\footnote{This is the
+  first footnote. It appears at the bottom in a footer bar.} and the full
+  text is collected into a bar at the slide bottom, matching the title-page
+  license bar style.
+
+  Multiple footnotes\footnote{Second footnote, demonstrating numbering.}
+  are numbered per slide; the counter resets on each new frame.
+\end{frame}
+
+\begin{frame}{Citations and bibliography}
+  \framesubtitle{\texttt{\string\citep} and \texttt{\string\citet} with footer references}
+  With \texttt{\string\slidesbib\{refs\}} in the preamble,
+  \texttt{\string\citep} and \texttt{\string\citet} show the numeric marker
+  in the text and put the full reference in the footer bar via
+  \texttt{\string\bibentry}.
+
+  Example: \citep{langbein2026} describes the theme,
+  while \citet{knuth1984} is the classic \TeX{} reference.
+  \begin{block}{Setup}
+    \small
+    \texttt{\string\slidesbib\{refs\}} in preamble registers the \texttt{.bib} file.\\
+    References appear only in the footer; there is no bibliography slide.
+  \end{block}
+\end{frame}
+
+% ==========================================================================
+%  PART II — STANDARD BEAMER FEATURES (Qyber theme)
+% ==========================================================================
+
+\section{Overlays}
+
+\begin{frame}{Overlays: \texttt{\string\pause}}
+  \framesubtitle{Content appears step by step}
+  \begin{itemize}
+    \item This is visible from the start.
+      \pause
+    \item This appears on the second step.
+      \pause
+    \item This on the third.
+  \end{itemize}
+  \vspace{1ex}
+  After the final pause, all items are visible.
+\end{frame}
+
+\begin{frame}{Overlays: \texttt{\string\only} and \texttt{\string\onslide}}
+  \framesubtitle{Fine-grained overlay control}
+  \begin{itemize}
+    \item \texttt{\string\only<2>\{text\}}: \only<2>{Visible on slide 2 only.}
+    \item \texttt{\string\onslide<3->\{text\}}: \onslide<3->{Visible from slide 3 onwards.}
+    \item \texttt{\string\uncover<2-3>\{text\}}: \uncover<2-3>{Visible on slides 2 and 3 (space reserved).}
+    \item \texttt{\string\visible<4>\{text\}}: \visible<4>{Visible on slide 4 only (space reserved).}
+  \end{itemize}
+  \vspace{1ex}
+  \only<1>{Slide 1: only the first item and this text.}%
+  \only<2>{Slide 2: \texttt{\string\only} and \texttt{\string\uncover} items appear.}%
+  \only<3>{Slide 3: \texttt{\string\onslide} and \texttt{\string\uncover} items shown.}%
+  \only<4>{Slide 4: \texttt{\string\visible} item shown.}%
+\end{frame}
+
+\begin{frame}{Item-level overlay specifications}
+  \framesubtitle{\texttt{<n->} on list items}
+  \begin{enumerate}
+    \item<1-> Visible from slide 1
+    \item<2-> Visible from slide 2
+    \item<3-> Visible from slide 3
+    \item<1,3> Visible on slides 1 and 3 only
+  \end{enumerate}
+  \vspace{1ex}
+  \texttt{\string\alt} example:
+  \alt<2>{This text is shown on slide 2.}{This text is shown on all other slides.}
+\end{frame}
+
+\begin{frame}{Overlay actions on text}
+  \framesubtitle{\texttt{\string\textbf<n>}, \texttt{\string\color<n>}, \texttt{\string\action<spec>}}
+  \begin{itemize}
+    \item Normal text, \textbf<2>{bold on slide 2}, normal again.
+    \item \action<3| alert@3>{Alerted on slide 3.}
+    \item \temporal<2>{Before slide 2}{On slide 2}{After slide 2}
+  \end{itemize}
+\end{frame}
+
+\section{Columns}
+
+\begin{frame}{Beamer columns (raw)}
+  \framesubtitle{\texttt{columns} / \texttt{column} environments}
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \begin{block}{Column 1}
+        One-third width. Beamer's native \texttt{columns} environment
+        gives full control over widths.
+      \end{block}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \begin{exampleblock}{Column 2}
+        Another third.  Any block type works inside columns.
+      \end{exampleblock}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \begin{alertblock}{Column 3}
+        Final third. Use \texttt{[T]} for top alignment or
+        \texttt{[c]} for centred.
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Mathematics}
+
+\begin{frame}{Mathematics}
+  \framesubtitle{Inline, display, and numbered equations}
+  Inline: $a^2 + b^2 = c^2$, and $\sum_{i=1}^n i = \frac{n(n+1)}{2}$.
+  \begin{displaymath}
+    \int_0^{+\infty} e^{-x^2}\,\mathrm{d}x = \frac{\sqrt{\pi}}{2}
+  \end{displaymath}
+  Numbered:
+  \begin{equation}
+    \nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}
+  \end{equation}
+  Aligned:
+  \begin{align}
+    f(x) &= x^2 + 2x + 1 \\
+    &= (x+1)^2
+  \end{align}
+\end{frame}
+
+\begin{frame}{Theorem environments}
+  \framesubtitle{Beamer's built-in theorem, proof, definition, example}
+  \begin{theorem}[Pythagoras]
+    In a right triangle with legs $a$, $b$ and hypotenuse $c$:
+    $a^2 + b^2 = c^2$.
+  \end{theorem}
+  \begin{proof}
+    By area comparison of squares on each side. \qedhere
+  \end{proof}
+  \begin{definition}
+    A \emph{prime number} is a natural number greater than 1 that has no
+    positive divisors other than 1 and itself.
+  \end{definition}
+\end{frame}
+
+\section{Figures \& Tables}
+
+\begin{frame}{Figures and tables}
+  \framesubtitle{Graphics and tabular side by side}
+  \begin{columns}[onlytextwidth,c]
+    \begin{column}{0.48\linewidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{example-image-b}
+      \captionof{figure}{A placeholder image.}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \centering
+      \begin{tabular}{lcc}
+        \hline
+        Method & Accuracy & Time \\
+        \hline
+        Baseline & 78.2\% & 1.2s \\
+        Ours     & 91.5\% & 0.8s \\
+        Oracle   & 99.1\% & 3.4s \\
+        \hline
+      \end{tabular}
+      \captionof{table}{Comparison of methods.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Hyperlinks \& Navigation}
+
+\begin{frame}{Hyperlinks and navigation buttons}
+  \framesubtitle{\texttt{\string\hyperlink}, \texttt{\string\beamerbutton}, etc.}
+  \hypertarget{linktarget}{}%
+  \begin{itemize}
+    \item \texttt{\string\hyperlink\{label\}\{text\}}: jump to a labelled frame.
+    \item \texttt{\string\beamerbutton\{text\}}: \beamerbutton{Button}
+    \item \texttt{\string\beamergotobutton\{text\}}: \beamergotobutton{Go to}
+    \item \texttt{\string\beamerreturnbutton\{text\}}: \beamerreturnbutton{Return}
+    \item \texttt{\string\beamerskipbutton\{text\}}: \beamerskipbutton{Skip}
+  \end{itemize}
+  \vspace{1ex}
+  Example link: \hyperlink{linktarget}{\beamergotobutton{Jump to this slide}}.
+\end{frame}
+
+\section{Frame Options}
+
+\begin{frame}[plain]{}
+  \vfill
+  \begin{center}
+    {\Large\textcolor{fg_head_col}{Plain frame}}\\[2ex]
+    \texttt{[plain]} removes headers and footers.\\
+    Useful for full-bleed images or section dividers.
+  \end{center}
+  \vfill
+\end{frame}
+
+\begin{frame}[fragile]{Fragile frame}
+  \framesubtitle{\texttt{[fragile]} required for verbatim content}
+  Use \texttt{[fragile]} when the frame contains verbatim or code:
+  \begin{semiverbatim}
+    \\documentclass[sans,numeric]\{qslides\}
+    \\title\{My Talk\}
+    \\author\{A. Speaker\}
+    \\begin\{document\}
+    \\begin\{frame\}\\titlepage\\end\{frame\}
+    \\begin\{frame\}\{Hello\}Content.\\end\{frame\}
+    \\end\{document\}
+  \end{semiverbatim}
+\end{frame}
+
+\begin{frame}{Frame alignment options}
+  \framesubtitle{\texttt{[t]} (default), \texttt{[c]}, \texttt{[b]}}
+  \begin{twocolumns}[t]
+    \begin{leftcolumn}
+      \begin{block}{\texttt{[t]} top (default in qslides)}
+        Content starts at the top of the frame body.
+        This is the qslides default because \texttt{LoadClass[...,t]\{beamer\}}
+        is set in the class file.
+      \end{block}
+    \end{leftcolumn}
+    \begin{rightcolumn}
+      \begin{block}{\texttt{[c]} and \texttt{[b]}}
+        Add \texttt{[c]} to a frame for vertically centred content, or
+        \texttt{[b]} for bottom-aligned content.  These override the class
+        default for that frame only.
+      \end{block}
+    \end{rightcolumn}
+  \end{twocolumns}
+\end{frame}
+
+\begin{frame}[label=labelexample]{Labelled frame}
+  \framesubtitle{\texttt{[label=name]} for cross-references}
+  This frame has \texttt{[label=labelexample]}.  Reference it with\\
+  \texttt{\string\hyperlink\{labelexample\}\{...\}}
+  or use it as an \texttt{\string\againframe} target.
+  \begin{block}{Other frame options}
+    \small
+    \begin{description}
+      \item[\texttt{allowframebreaks}] Auto-split long content across slides (useful for bibliographies).
+      \item[\texttt{shrink}] Shrink content to fit; use sparingly.
+      \item[\texttt{squeeze}] Reduce vertical spacing to fit more.
+    \end{description}
+  \end{block}
+\end{frame}
+
+\section{Sections \& TOC}
+
+\begin{frame}{Sections and navigation}
+  \framesubtitle{\texttt{\string\section}, \texttt{\string\subsection}, \texttt{\string\tableofcontents}}
+  \begin{twocolumns}[t]
+    \begin{leftcolumn}
+      \begin{itemize}
+        \item \texttt{\string\section\{Name\}}
+        \item \texttt{\string\subsection\{Name\}}
+        \item \texttt{\string\tableofcontents}
+        \item \texttt{[currentsection]} highlights active section
+      \end{itemize}
+    \end{leftcolumn}
+    \begin{rightcolumn}
+      \begin{codeblock}{Auto-outline}
+        \small
+        \texttt{\string\AtBeginSection[]\{}\\
+          \texttt{\ \ \string\begin\{frame\}\{Outline\}}\\
+          \texttt{\ \ \ \ \string\tableofcontents[currentsection]}\\
+        \texttt{\ \ \string\end\{frame\}\}}
+      \end{codeblock}
+    \end{rightcolumn}
+  \end{twocolumns}
+\end{frame}
+
+\begin{frame}{Current section highlight}
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \tableofcontents[sections={1-9},currentsection]
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \tableofcontents[sections={10-17},currentsection]
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Verbatim \& Code}
+
+\begin{frame}[fragile]{Verbatim and inline code}
+  \framesubtitle{\texttt{verbatim} environment and \texttt{\string\verb}}
+  Inline: \verb|\documentclass{qslides}| renders in monospace.
+
+  Block verbatim:
+  \begin{semiverbatim}
+    \\begin\{frame\}\{Title\}
+    \\begin\{block\}\{Info\}
+    Content here.
+    \\end\{block\}
+    \\end\{frame\}
+  \end{semiverbatim}
+\end{frame}
+
+\section{Multimedia}
+
+\begin{frame}{Multimedia (overview)}
+  \framesubtitle{\texttt{\string\movie}, \texttt{\string\sound}, \texttt{\string\animate}}
+  Beamer supports embedding multimedia via the \texttt{multimedia} package:
+  \begin{block}{Commands}
+    \begin{itemize}
+      \item \texttt{\string\movie\{poster\}\{file\}} --- embed a video.
+        Options: \texttt{autostart}, \texttt{loop}, \texttt{width}, \texttt{height}.
+      \item \texttt{\string\sound\{text\}\{file\}} --- embed audio.
+      \item \texttt{\string\animate} --- animate overlays.
+    \end{itemize}
+  \end{block}
+  \begin{alertblock}{Note}
+    Multimedia support depends on the PDF viewer. Tested with Okular and
+    Adobe Acrobat. External files must be present at build time.
+  \end{alertblock}
+\end{frame}
+
+\section{Notes}
+
+\begin{frame}{Speaker notes}
+  \framesubtitle{\texttt{\string\note\{...\}} and presentation modes}
+  \note{This is a speaker note visible in notes mode.}
+  \begin{itemize}
+    \item \texttt{\string\note\{text\}} attaches a note to the current slide.
+    \item \texttt{\string\note[item]\{text\}} adds to a note list.
+    \item Build with \texttt{notes} option to show notes:
+      \texttt{\string\documentclass[notes]\{qslides\}}.
+    \item \texttt{handout} mode suppresses overlays for print.
+  \end{itemize}
+  \begin{codeblock}{Dual-screen setup}
+    \small
+    \texttt{\string\documentclass[notes]\{qslides\}}\\
+    \texttt{\string\setbeameroption\{show notes on second screen=right\}}
+  \end{codeblock}
+\end{frame}
+
+\section{Appendix}
+
+\begin{frame}{Appendix slides}
+  \framesubtitle{\texttt{\string\appendix} and backup slides}
+  \begin{block}{Usage}
+    Place \texttt{\string\appendix} after the last regular slide.
+    Slides after \texttt{\string\appendix} do not count towards the
+    total frame number shown in the header.
+  \end{block}
+  \begin{codeblock}{Convention}
+    \small
+    \texttt{\string\appendix}\\
+    \texttt{\string\begin\{frame\}\{Backup: Extra Data\}}\\
+    \texttt{\ \ Additional material for Q\&A.}\\
+    \texttt{\string\end\{frame\}}
+  \end{codeblock}
+\end{frame}
+
+\section{Transitions}
+
+\begin{frame}{Slide transitions (overview)}
+  \framesubtitle{PDF viewer dependent}
+  Beamer can embed slide transition effects into the PDF.  These require
+  a supporting viewer (e.g.\ Okular, Adobe Acrobat in full-screen mode).
+  \begin{block}{Commands}
+    \small
+    \begin{columns}[onlytextwidth,T]
+      \begin{column}{0.48\linewidth}
+        \begin{itemize}
+          \item \texttt{\string\transdissolve}
+          \item \texttt{\string\transblindshorizontal}
+          \item \texttt{\string\transblindsvertical}
+          \item \texttt{\string\transboxin}
+        \end{itemize}
+      \end{column}
+      \begin{column}{0.48\linewidth}
+        \begin{itemize}
+          \item \texttt{\string\transboxout}
+          \item \texttt{\string\transwipe}
+          \item \texttt{\string\transcover}
+          \item \texttt{\string\transfade}
+        \end{itemize}
+      \end{column}
+    \end{columns}
+  \end{block}
+  Apply to a single frame or globally with\\
+  {\small\texttt{\string\addtobeamertemplate\{background\}\{\string\transfade\}\{\}}}.
+\end{frame}
+
+\section{Description Lists}
+
+\begin{frame}{Description lists}
+  \framesubtitle{Beamer \texttt{description} environment}
+  \begin{description}
+    \item[qslides] Beamer-based slide class with Qyber dark theme.
+    \item[qarticle] Article-style class for papers (no chapters).
+    \item[qbook] Book-style class for theses and long documents.
+    \item[qtex.sty] Shared package: fonts, layout, citations, metadata.
+  \end{description}
+\end{frame}
+
+\section{Summary}
+
+\begin{frame}{Summary}
+  \framesubtitle{Quick reference card}
+  \small\vskip-2ex%
+  \begin{columns}[onlytextwidth,T]
+    \begin{column}{0.48\linewidth}
+      \begin{block}{Qslides features}
+        \begin{description}
+          \item[Title] \texttt{titlebasic}/\texttt{titlesplit}, \texttt{\string\titlebox}
+          \item[Blocks] 6 types $\times$ 2 (with/without header)
+          \item[Layout] \texttt{slidebox}, \texttt{twocolumns}, \texttt{placebox}
+          \item[Video] 5 layout modes + \texttt{\string\enablefooter}
+          \item[Cite] \texttt{\string\citep}/\texttt{\string\citet} in footer
+          \item[Colours] Full named palette (\texttt{bg\_*}, \texttt{fg\_*}, \texttt{ac\_*})
+        \end{description}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\linewidth}
+      \begin{block}{Beamer features}
+        \begin{description}
+          \item[Overlays] \texttt{\string\pause}, \texttt{\textless n-\textgreater}, \texttt{\string\only}, \texttt{\string\alt}
+          \item[Maths] Equations, theorems, proofs
+          \item[Media] \texttt{\string\movie}, \texttt{\string\sound}
+          \item[Frames] \texttt{plain}, \texttt{fragile}, \texttt{label}
+          \item[Nav] Sections, TOC, hyperlink buttons
+          \item[Notes] \texttt{\string\note}, handout mode
+        \end{description}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\end{document}

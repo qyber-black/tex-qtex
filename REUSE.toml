@@ -1,0 +1,20 @@
+version = 1
+SPDX-PackageName = "qtex"
+
+[[annotations]]
+path = "examples/qbook/bibliography.bib"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Frank Langbein <frank@langbein.org>"
+SPDX-License-Identifier = "LPPL-1.3c"
+
+[[annotations]]
+path = "examples/qarticle/bibliography.bib"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Frank Langbein <frank@langbein.org>"
+SPDX-License-Identifier = "LPPL-1.3c"
+
+[[annotations]]
+path = "examples/qslides/refs.bib"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Frank Langbein <frank@langbein.org>"
+SPDX-License-Identifier = "LPPL-1.3c"

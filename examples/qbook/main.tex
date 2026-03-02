@@ -1,0 +1,426 @@
+% Example document using qbook class — comprehensive guide
+% Build from package root: make qbook (or make)
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+%
+% This file demonstrates every qbook / qtex feature and serves as a
+% compact user manual.  Lipsum text is used to fill pages so that
+% headers, footers, spacing, and page layout are visible.
+%
+% Class options (try uncommenting alternatives):
+%   Font:        sans (default) | serif | hacker
+%   Layout:      oneside (default) | twoside
+%   Citation:    numeric (default) | harvard
+%   Alignment:   raggedright (default) | justified
+%   Paragraph:   parskip (default) | parindent
+%   Line spacing: single (default) | onehalfspacing | linespread115 | linespread12
+%   Extras:      fullwidth, italic, obfuscate (LuaLaTeX)
+%TC:subst \string\ STR
+
+\documentclass[sans,oneside,numeric,raggedright,fullwidth]{qbook}
+% \documentclass[serif,twoside,harvard,justified,parindent]{qbook}
+% \documentclass[hacker,oneside,numeric,raggedright]{qbook}
+
+\usepackage{lipsum}
+
+% --------------------------------------------------------------------------
+%  Metadata
+% --------------------------------------------------------------------------
+\title{The \texttt{qbook} Class --- User Guide}
+\author{Author Name}
+\university{Example Publishing House}
+\date{\today}
+
+\license{LPPL-1.3c}
+\copyrightholder{Author Name}
+\licenseyear{2026}
+\keywords{example, book, qtex, typography, layout, guide}
+
+% --------------------------------------------------------------------------
+%  Document
+% --------------------------------------------------------------------------
+\begin{document}
+\frontmatter
+
+% \maketitle{abstract} prints: title page, copyright page (if \license is
+% set), abstract chapter, and \frontlists (TOC, LOF, LOT, acronyms).
+\maketitle{%
+  This book serves as a comprehensive guide to the \texttt{qbook} class,
+  which extends the standard \LaTeX{} \texttt{book} class with
+  typography, layout, citations, and metadata features shared across the
+  \texttt{qtex} package family.  It demonstrates every command and option
+  the class provides and uses lipsum text so that page layout, headers,
+  and spacing are visible across multiple pages.
+}
+
+% --------------------------------------------------------------------------
+%  Dedication (unnumbered chapter in front matter)
+% --------------------------------------------------------------------------
+\dedication{To everyone who enjoys well-typeset books.}
+
+% --------------------------------------------------------------------------
+%  Preface
+% --------------------------------------------------------------------------
+\chapter{Preface}
+
+This guide covers the structure and features of the \texttt{qbook} class.
+Unlike the \texttt{qarticle} class (which is section-based), \texttt{qbook}
+supports front matter, chapters, appendices, and back matter --- making it
+suitable for theses, dissertations, monographs, and technical books.
+
+The first chapter explains class options and document structure commands.
+The second chapter demonstrates typography and layout features.  The third
+chapter covers content elements such as figures, tables, lists,
+mathematics, citations, and acronyms.  An appendix shows appendix
+numbering.
+
+% --------------------------------------------------------------------------
+%  Acknowledgements
+% --------------------------------------------------------------------------
+\chapter{Acknowledgements}
+
+The author thanks colleagues, friends, and institutions that supported the
+creation of this guide.  Acknowledgements go here, in an unnumbered front
+matter chapter.
+
+\lipsum[1]
+
+% ==========================================================================
+\mainmatter
+% ==========================================================================
+
+% **************************************************************************
+\chapter{Using \texttt{qbook}}\label{ch:using}
+% **************************************************************************
+
+\section{Class Options}\label{sec:options}
+
+All options are forwarded to \texttt{qtex.sty}.  The \verb|\documentclass|
+line at the top of this file uses the defaults; commented-out alternatives
+show other combinations.
+
+\subsection{Font families}
+
+\begin{description}
+  \item[\texttt{sans}] Source Sans Pro (default).
+  \item[\texttt{serif}] Source Serif Pro.
+  \item[\texttt{hacker}] Inconsolata monospaced.
+\end{description}
+
+\subsection{Layout and alignment}
+
+\begin{description}
+  \item[\texttt{oneside} / \texttt{twoside}] Single- or double-sided pages.
+    With \texttt{twoside}, headers alternate and margins mirror.
+  \item[\texttt{raggedright} / \texttt{justified}] Left-aligned (default) or
+    fully justified text.
+  \item[\texttt{parskip} / \texttt{parindent}] Paragraph separation by
+    vertical space (default) or first-line indent.
+  \item[\texttt{fullwidth}] Enables \texttt{fullwidth},
+    \texttt{fullwidthfigure}, and \texttt{fullwidthtable} environments.
+  \item[\texttt{italic}] Section headings and captions use italic instead of
+    bold.
+\end{description}
+
+\subsection{Line spacing}
+
+\begin{description}
+  \item[\texttt{single}] Default.
+  \item[\texttt{onehalfspacing}] 1.5 line spacing.
+  \item[\texttt{linespread115}] \verb|\linespread{1.15}|.
+  \item[\texttt{linespread12}] \verb|\linespread{1.2}|.
+\end{description}
+
+\subsection{Citation and other options}
+
+\begin{description}
+  \item[\texttt{numeric} / \texttt{harvard}] Numeric or author-year
+    citations via \texttt{natbib}.
+  \item[\texttt{obfuscate} / \texttt{noobfuscate}] Font obfuscation for
+    blind review (LuaLaTeX only).
+\end{description}
+
+\lipsum[2]
+
+\section{Document Structure}\label{sec:structure}
+
+The \texttt{qbook} class follows the standard \LaTeX{} book structure
+with some additions:
+
+\subsection{Front matter}
+
+\verb|\frontmatter| switches to roman page numerals.  Chapters in front
+matter are unnumbered.  Do not use \verb|\subsection| in front matter (a
+warning is issued).
+
+\subsection{Title and abstract}
+
+\verb|\maketitle{abstract}| prints the title page, an optional copyright
+page (when \verb|\license{...}| is set), an abstract chapter with optional
+keywords, and then calls \verb|\frontlists|.
+
+\subsection{Front lists}
+
+\verb|\frontlists| automatically generates the Table of Contents, and
+conditionally the List of Figures, List of Tables, List of Algorithms, and
+List of Acronyms --- only when each list is non-empty.
+
+\subsection{Dedication}
+
+\verb|\dedication{text}| prints a right-aligned, italicised dedication on
+its own page.
+
+\subsection{Main matter}
+
+\verb|\mainmatter| switches to arabic page numerals and enables
+chapter/section numbering (depth~3, i.e.\ down to \verb|\subsubsection|).
+
+\subsection{Back matter and appendix}
+
+\verb|\backmatter| restores appendix numbering (A, B, C, \ldots).
+\verb|\appendix| marks the start of appendices.  Appendix chapters are
+labelled ``Appendix A'', ``Appendix B'', etc., and appear in the table
+of contents.
+
+\subsection{Bibliography}
+
+\verb|\bib{basename}| prints an optional License chapter (when
+\verb|\license{...}| is set), then the bibliography.  The bibliography
+style is chosen automatically:
+\texttt{plainnat} for \texttt{numeric}, \texttt{agsm} for
+\texttt{harvard}.
+
+\lipsum[3]
+
+\section{Metadata Commands}\label{sec:metadata}
+
+\begin{itemize}
+  \item \verb|\title{...}| --- book title.
+  \item \verb|\author{...}| --- author name.
+  \item \verb|\degree{...}| --- optional line under the author (e.g.\
+    ``Second Edition'').
+  \item \verb|\university{...}| --- affiliation or publisher.
+  \item \verb|\date{...}| --- date.
+  \item \verb|\keywords{...}| --- keywords shown in the abstract.
+  \item \verb|\license{SPDX-ID}| --- enables copyright and license output.
+  \item \verb|\copyrightholder{...}| --- copyright holder name(s).
+  \item \verb|\licenseyear{YYYY}| --- copyright year.
+\end{itemize}
+
+% **************************************************************************
+\chapter{Typography and Layout}\label{ch:typography}
+% **************************************************************************
+
+\section{Page Headers}
+
+Running headers show the current chapter or section title in letterspaced
+small caps, with the page number on the outer edge.  Chapter opening pages
+use a special ``chapter'' page style with a thick rule and the chapter
+label (``Chapter~1'', ``Appendix~A'').
+
+\lipsum[4]
+
+\section{Chapter and Section Headings}
+
+Chapter titles are set in \verb|\Huge| bold (or italic with the
+\texttt{italic} option).  Section headings use \verb|\Large| bold,
+subsection \verb|\large| bold, and subsubsection \verb|\normalsize| bold.
+Spacing above and below headings is configured by \texttt{titlesec} in
+\texttt{qtex.sty}.
+
+\subsection{A Subsection}
+
+\lipsum[5]
+
+\subsubsection{A Subsubsection}
+
+\lipsum[6]
+
+\section{New Thought}
+
+\newthought{New thoughts} introduce a paragraph with letterspaced small
+caps, creating visual rhythm inspired by Tufte's book designs.
+
+\lipsum[7]
+
+\section{Epigraph}
+
+\epigraph{A book is a dream that you hold in your hand.}{Neil Gaiman}
+
+An epigraph is a short quotation placed flush-right, typically at the
+start of a chapter or section.
+
+\section{Fullwidth Environments}
+
+With the \texttt{fullwidth} class option, three environments extend into
+the margins:
+
+\begin{fullwidth}
+  \textbf{This paragraph is inside a \texttt{fullwidth} environment.}
+  It extends 2\,cm into both margins, giving a wider line for
+  tables, figures, or text that benefits from extra horizontal space.
+  \lipsum[8]
+\end{fullwidth}
+
+See also \texttt{fullwidthfigure} and \texttt{fullwidthtable} for floats
+that automatically span the full width.
+
+\section{Verse, Quotation, Quote}
+
+\begin{verse}
+  Shall I compare thee to a summer's day?\\
+  Thou art more lovely and more temperate.
+\end{verse}
+
+\begin{quotation}
+  Typography is a beautiful group of letters, not a group of beautiful
+  letters.  A quotation block uses small text with a slight indent.
+  \lipsum[9]
+\end{quotation}
+
+\begin{quote}
+  Short quotes use the \texttt{quote} environment with no paragraph indent.
+\end{quote}
+
+% **************************************************************************
+\chapter{Content Elements}\label{ch:content}
+% **************************************************************************
+
+\section{Lists}
+
+\subsection{Itemize}
+
+\begin{itemize}
+  \item First item
+    \begin{itemize}
+      \item Sub-item one
+      \item Sub-item two
+        \begin{itemize}
+          \item Sub-sub-item
+        \end{itemize}
+    \end{itemize}
+  \item Second item
+  \item Third item
+\end{itemize}
+
+\subsection{Enumerate}
+
+\begin{enumerate}
+  \item Step one
+    \begin{enumerate}
+      \item Sub-step A
+      \item Sub-step B
+    \end{enumerate}
+  \item Step two
+  \item Step three
+\end{enumerate}
+
+\subsection{Description}
+
+\begin{description}
+  \item[qbook] Book-style class with chapters and appendices.
+  \item[qarticle] Article-style class with sections only.
+  \item[qtex.sty] Shared typography, layout, and citation package.
+\end{description}
+
+\section{Mathematics}
+
+Inline: $a^2 + b^2 = c^2$ and $\int_0^1 x\,\mathrm{d}x = \tfrac{1}{2}$.
+
+Numbered:
+\begin{equation}\label{eq:euler}
+  e^{i\pi} + 1 = 0
+\end{equation}
+
+Aligned:
+\begin{align}
+  \nabla\cdot\mathbf{E} &= \frac{\rho}{\varepsilon_0}  \label{eq:gauss}\\
+  \nabla\times\mathbf{B} &= \mu_0\mathbf{J} + \mu_0\varepsilon_0\frac{\partial\mathbf{E}}{\partial t} \label{eq:ampere}
+\end{align}
+
+See Equations~\eqref{eq:euler}--\eqref{eq:ampere}.
+
+\section{Figures}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\linewidth]{example-image-a}
+  \caption{A placeholder figure.  Captions use \texttt{\string\small} and
+    are configured by the \texttt{caption} package in \texttt{qtex.sty}.}
+  \label{fig:example}
+\end{figure}
+
+Figure~\ref{fig:example} shows a placeholder image.
+
+\begin{fullwidthfigure}[htbp]
+  \includegraphics[width=\linewidth]{example-image-b}
+  \caption{A fullwidth figure extending into both margins (requires the
+    \texttt{fullwidth} class option).}
+  \label{fig:fullwidth}
+\end{fullwidthfigure}
+
+\section{Tables}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Summary of runs.}\label{tab:summary}
+  \begin{tabular}{lccc}
+    \hline
+    Run      & Mean & Std.\ dev. & $n$ \\
+    \hline
+    Baseline & 1.20 & 0.10 & 50 \\
+    Var.\ A  & 1.52 & 0.21 & 50 \\
+    Var.\ B  & 1.08 & 0.15 & 50 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:summary} summarises the results.
+
+\section{Footnotes}
+
+Footnotes\footnote{This is a footnote.  The rule spans 40\% of the column
+width.} are numbered per chapter and use compact spacing configured in
+\texttt{qtex.sty}.
+
+\section{Citations}
+
+Use \verb|\citep{key}| for parenthetical: \citep{example-book}, and
+\verb|\citet{key}| for textual: \citet{example-paper}.
+Multiple keys: \citep{example-book,example-conf}.
+
+\lipsum[10]
+
+\section{Acronyms}
+
+First use: \gls{api}.  Second use: \gls{api}.  Plural: \glspl{ui}.
+The acronym list is printed automatically by \verb|\frontlists| when
+acronyms exist.  Override the acronym file:
+
+\noindent\verb|\renewcommand{\qtexacronymfile}{yourfile.tex}|
+
+\lipsum[11]
+
+% ==========================================================================
+\backmatter
+% ==========================================================================
+
+\appendix
+\chapter{Supplementary Material}\label{app:supplement}
+
+Appendix chapters use letters: A, B, C, \ldots.  Sections within an
+appendix are numbered A.1, A.2, etc.
+
+\section{Extended Data}\label{app:data}
+
+\lipsum[12]
+
+\section{Derivations}\label{app:derivations}
+
+\lipsum[13]
+
+% --------------------------------------------------------------------------
+%  Bibliography (with automatic License chapter when \license{...} is set)
+% --------------------------------------------------------------------------
+\bib{bibliography}
+\end{document}

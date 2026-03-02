@@ -1,0 +1,35 @@
+% beamerthemeqyber.sty -- Qyber beamer theme (main)
+%
+% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+% SPDX-License-Identifier: LPPL-1.3c
+
+\mode<presentation>
+
+% Requirement
+\RequirePackage{tikz}
+
+% Theme options
+\DeclareOptionBeamer{header}{\PassOptionsToPackage{header}{beamerouterthemeqyber}}
+\DeclareOptionBeamer{footer}{\PassOptionsToPackage{footer}{beamerouterthemeqyber}}
+
+% Process options
+\ProcessOptionsBeamer
+
+% Settings
+\useinnertheme{qyber}
+\useoutertheme{qyber}
+\usecolortheme{qyber}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{blocks}[qyber]
+
+%\usefonttheme{professionalfonts} % using non standard fonts for beamer
+\usefonttheme{structurebold} % default family is serif
+
+\setbeamersize{text margin left=12pt,text margin right=12pt}
+
+% Default title page layout (qslides can override to qyber-split)
+\setbeamertemplate{title page}[qyber-basic]
+
+\mode<all>
+

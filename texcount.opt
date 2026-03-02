@@ -1,0 +1,47 @@
+%% texcount option file for qtex classes (qbook, qarticle, qslides)
+%% Used by: make wordcount
+%%
+%% Syntax: %macro \cmd [state,state,...] where state is:
+%%   0 or ignore = skip parameter, 1 or text = count as text,
+%%   header = count as header.  [] = no parameters.
+%%
+%% SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
+%% SPDX-License-Identifier: LPPL-1.3c
+
+%% --- Shared (qtex.sty) metadata commands ---
+%macro \title [ignore]
+%macro \degree [ignore]
+%macro \university [ignore]
+%macro \date [ignore]
+%macro \keywords [ignore]
+%macro \license [ignore]
+%macro \copyrightholder [ignore]
+%macro \licenseyear [ignore]
+%macro \epigraph [text,ignore]
+%macro \newthought [header]
+%macro \bib [ignore]
+
+%% --- qarticle ---
+%macro \author [ignore,ignore]
+%macro \printauthors []
+%macro \maketitlewithabstract [text]
+
+%% --- qbook ---
+%macro \dedication [text]
+%macro \frontlists []
+
+%% --- qslides ---
+%macro \subtitle [ignore]
+%macro \slidesbib [ignore]
+%macro \slidesurls [ignore]
+%macro \setqyberauthorurl [ignore]
+%macro \titlebox [ignore]
+%macro \placebox [ignore,ignore,ignore,ignore,text]
+%macro \hi [text]
+%envir slidebox [ignore] text
+%envir twocolumns [ignore] text
+%envir leftcolumn [] text
+%envir rightcolumn [] text
+%envir codeblock [] text
+%envir frame [ignore] text
+%envir semiverbatim [] text
