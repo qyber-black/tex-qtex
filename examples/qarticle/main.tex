@@ -32,13 +32,13 @@
   Department of Computer Science, Example University;
   E-mail: \url{first@example.org};
   Homepage: \url{https://example.org/first};
-  ORCID: \url{https://orcid.org/0000-0001-2345-6789}}
+ORCID: \url{https://orcid.org/0000-0001-2345-6789}}
 \author{Second Author}{%
   Other Department, Other University;
-  E-mail: \url{second@example.org}}
+E-mail: \url{second@example.org}}
 \author{Third Author}{%
   Department of Computer Science, Example University;
-  E-mail: \url{third@example.org}}
+E-mail: \url{third@example.org}}
 
 \license{LPPL-1.3c}
 \copyrightholder{First Author, Second Author, Third Author}
@@ -147,11 +147,11 @@ Three font families are available:
 \subsection{Title, authors, and date}
 
 \begin{itemize}
-  \item \verb|\title{...}| --- document title.
-  \item \verb|\author{Name}{Details}| --- call once per author.  \texttt{Name}
+    \item \verb|\title{...}| --- document title.
+    \item \verb|\author{Name}{Details}| --- call once per author.  \texttt{Name}
     appears under the title; \texttt{Details} (institution, e-mail, URL,
     ORCID) are printed by \verb|\printauthors| (see \S\ref{sec:authors}).
-  \item \verb|\date{...}| --- date line; \verb|\today| produces the current
+    \item \verb|\date{...}| --- date line; \verb|\today| produces the current
     date in ``day Month year'' format.
 \end{itemize}
 
@@ -163,12 +163,12 @@ abstract box.  If no keywords are set, the line is omitted.
 \subsection{License and copyright}
 
 \begin{itemize}
-  \item \verb|\license{SPDX-ID}| --- enables the license section before the
+    \item \verb|\license{SPDX-ID}| --- enables the license section before the
     bibliography.  Recognised SPDX identifiers are resolved to full names
     and URLs automatically.
-  \item \verb|\copyrightholder{Name(s)}| --- copyright holder(s); defaults
+    \item \verb|\copyrightholder{Name(s)}| --- copyright holder(s); defaults
     to the first \verb|\author| name.
-  \item \verb|\licenseyear{YYYY}| --- copyright year; defaults to the
+    \item \verb|\licenseyear{YYYY}| --- copyright year; defaults to the
     current year.
 \end{itemize}
 
@@ -270,7 +270,7 @@ Numbered equation:
 Aligned equations:
 \begin{align}
   f(x) &= x^2 + 2x + 1 \label{eq:expand}\\
-       &= (x+1)^2       \label{eq:factor}
+  &= (x+1)^2       \label{eq:factor}
 \end{align}
 
 See Equation~\eqref{eq:gauss} for Gauss's law and
@@ -283,8 +283,7 @@ Equations~\eqref{eq:expand}--\eqref{eq:factor} for the factored form.
   \includegraphics[width=0.6\linewidth]{example-image-a}
   \caption{A placeholder figure.  Captions use \texttt{\string\small} font
     size.  With the \texttt{italic} option, both label and text are
-    italicised.}
-  \label{fig:example}
+  italicised.}\label{fig:example}
 \end{figure}
 
 See Figure~\ref{fig:example} for the placeholder image.
@@ -406,6 +405,5 @@ describe ethics approvals, informed consent, and harm mitigation.
 % --------------------------------------------------------------------------
 %  Bibliography (with automatic License section when \license{...} is set)
 % --------------------------------------------------------------------------
-\label{sec:bibliography}%
-\bib{bibliography}
+\bib{bibliography}\label{sec:bibliography}
 \end{document}
