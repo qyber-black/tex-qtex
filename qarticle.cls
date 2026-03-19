@@ -51,10 +51,10 @@
 }
 
 % ------------------------------------------------------------------------------
-% Abstract: no heading; rule above and below (same width as text); keywords inside; minimal vspace
+% Abstract: no heading; rule above and below (same width as text); keywords inside; same vspace as title–author
 % ------------------------------------------------------------------------------
 \renewenvironment{abstract}{%
-  \par\noindent
+  \par\vspace*{-\parskip}\vspace*{-\baselineskip}\noindent%
   \small
   \quotation
   \noindent\rule{\linewidth}{0.4pt}\par\vspace{0.1ex}\noindent%
@@ -133,9 +133,8 @@
 }
 \def\@maketitle{%
   \begin{center}%
-    \vspace*{1.5ex}%
     {\LARGE\bfseries \qtex@title\par}%
-    \vspace{1.5ex}%
+    \vspace{0.5ex}%
     {\large
       \lineskip .5em
       \ifqarticle@hasauthors

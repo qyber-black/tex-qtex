@@ -195,13 +195,15 @@
 
 \RequirePackage[acronym,nomain,toc]{glossaries}
 \setacronymstyle{long-short}
-\makeglossaries
 \newif\ifqtex@hasacronyms
 \qtex@hasacronymsfalse
 \pretocmd{\newacronym}{\global\qtex@hasacronymstrue}{}{}
 \newcommand{\qtexacronymfile}{acronyms.tex}
 \IfFileExists{\qtexacronymfile}{\input{\qtexacronymfile}}{}
-\AtBeginDocument{\glsaddall}
+\ifqtex@hasacronyms
+  \makeglossaries
+  \AtBeginDocument{\glsaddall}
+\fi
 
 \renewcommand{\cite}{%
   \PackageWarning{qtex}{Use \string\citep\space or \string\citet\space instead of \string\cite}%
