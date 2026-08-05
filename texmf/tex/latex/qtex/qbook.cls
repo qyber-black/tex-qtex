@@ -378,7 +378,9 @@
     Copyright\ \textcopyright\ \ifstrempty{\qtex@licenseyear}{\number\year}{\qtex@licenseyear}\ %
     \ifstrempty{\qtex@copyrightholder}{\qtex@author}{\qtex@copyrightholder}\par
     \vspace{1ex}
+    % REUSE-IgnoreStart
     This work is licensed under the \qtex@lic@name.\\{\ttfamily SPDX-License-Identifier: \qtex@licenseid}\\
+    % REUSE-IgnoreEnd
     Full text: \url{\qtex@lic@url}
   \end{center}
   \cleardoublepage
@@ -442,7 +444,9 @@
     \qbook@numberedchapterfalse
     \chaptermark{License}%
     \addcontentsline{toc}{chapter}{License}%
+    % REUSE-IgnoreStart
     This work is licensed under the \qtex@lic@name.\\{\ttfamily SPDX-License-Identifier: \qtex@licenseid}\par
+    % REUSE-IgnoreEnd
     \vspace{1ex}
     \edef\qtex@lic@textcs{qtex@licensetext@\qtex@licenseid}%
     \expandafter\@ifundefined\expandafter{\qtex@lic@textcs}{%

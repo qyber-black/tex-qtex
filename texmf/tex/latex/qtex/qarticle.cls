@@ -175,7 +175,9 @@
     \section*{License}\label{sec:license}{\small%
     Copyright\ \textcopyright\ \ifstrempty{\qtex@licenseyear}{\number\year}{\qtex@licenseyear}\ %
     \ifstrempty{\qtex@copyrightholder}{\qtex@author}{\qtex@copyrightholder}.\\
+    % REUSE-IgnoreStart
     This work is licensed under the \qtex@lic@name.\\{\ttfamily SPDX-License-Identifier: \qtex@licenseid}\\
+    % REUSE-IgnoreEnd
     Full text: \url{\qtex@lic@url}}\par
   \fi
   \bibliography{#1}%

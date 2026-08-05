@@ -9,9 +9,10 @@ QARTICLE_DIR := examples/qarticle
 QSLIDES_DIR := examples/qslides
 ENGINE ?= lua
 SEED ?= $(shell date +%s)
-TEXINPUTS_QBOOK := .:../..:
-TEXINPUTS_QARTICLE := .:../..:
-TEXINPUTS_QSLIDES := .:../..:
+TEXMF_DIR := texmf/tex/latex/qtex
+TEXINPUTS_QBOOK := .:../../texmf//:
+TEXINPUTS_QARTICLE := .:../../texmf//:
+TEXINPUTS_QSLIDES := .:../../texmf//:
 
 .PHONY: all qbook qarticle qslides clean distclean wordcount check help hacker-font
 
@@ -36,19 +37,19 @@ endif
 
 LATEXMK = latexmk
 
-$(QBOOK_DIR)/main.pdf: qbook.cls qtex.sty $(QBOOK_DIR)/main.tex $(QBOOK_DIR)/bibliography.bib $(QBOOK_DIR)/acronyms.tex
+$(QBOOK_DIR)/main.pdf: $(TEXMF_DIR)/qbook.cls $(TEXMF_DIR)/qtex.sty $(QBOOK_DIR)/main.tex $(QBOOK_DIR)/bibliography.bib $(QBOOK_DIR)/acronyms.tex
 	cd $(QBOOK_DIR) && TEXINPUTS="$(TEXINPUTS_QBOOK)" $(LATEXMK) $(LATEXMK_ENGINE) $(LATEXMK_CMD) main
 	-cd $(QBOOK_DIR) && makeglossaries main
 	cd $(QBOOK_DIR) && TEXINPUTS="$(TEXINPUTS_QBOOK)" $(LATEXMK) $(LATEXMK_ENGINE) $(LATEXMK_CMD) main
 
-$(QARTICLE_DIR)/main.pdf: qarticle.cls qtex.sty $(QARTICLE_DIR)/main.tex $(QARTICLE_DIR)/bibliography.bib $(QARTICLE_DIR)/acronyms.tex
+$(QARTICLE_DIR)/main.pdf: $(TEXMF_DIR)/qarticle.cls $(TEXMF_DIR)/qtex.sty $(QARTICLE_DIR)/main.tex $(QARTICLE_DIR)/bibliography.bib $(QARTICLE_DIR)/acronyms.tex
 	cd $(QARTICLE_DIR) && TEXINPUTS="$(TEXINPUTS_QARTICLE)" $(LATEXMK) $(LATEXMK_ENGINE) $(LATEXMK_CMD) main
 	-cd $(QARTICLE_DIR) && makeglossaries main
 	cd $(QARTICLE_DIR) && TEXINPUTS="$(TEXINPUTS_QARTICLE)" $(LATEXMK) $(LATEXMK_ENGINE) $(LATEXMK_CMD) main
 
-$(QSLIDES_DIR)/main.pdf: qslides.cls qtex.sty \
-  beamerthemeqyber.sty beamerinnerthemeqyber.sty \
-  beamerouterthemeqyber.sty beamercolorthemeqyber.sty \
+$(QSLIDES_DIR)/main.pdf: $(TEXMF_DIR)/qslides.cls $(TEXMF_DIR)/qtex.sty \
+  $(TEXMF_DIR)/beamerthemeqyber.sty $(TEXMF_DIR)/beamerinnerthemeqyber.sty \
+  $(TEXMF_DIR)/beamerouterthemeqyber.sty $(TEXMF_DIR)/beamercolorthemeqyber.sty \
   $(QSLIDES_DIR)/main.tex
 	cd $(QSLIDES_DIR) && TEXINPUTS="$(TEXINPUTS_QSLIDES)" $(LATEXMK) $(LATEXMK_ENGINE) $(LATEXMK_CMD) main
 

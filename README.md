@@ -98,10 +98,11 @@ make hacker-font  # generate obfuscated fonts (optional SEED=n)
 
 ## Structure
 
-- `qbook.cls`, `qarticle.cls`, `qslides.cls` — document classes
-- `qtex.sty` — shared package (options, fonts, layout, citations, glossaries, metadata, license handling)
-- `beamerthemeqyber.sty`, `beamerinnerthemeqyber.sty`, `beamerouterthemeqyber.sty`, `beamercolorthemeqyber.sty` — Qyber beamer theme
-- `qtex-licenses.tex` — full license texts for inline output
+- `texmf/tex/latex/qtex/` — LaTeX package and class files:
+  - `qbook.cls`, `qarticle.cls`, `qslides.cls` — document classes
+  - `qtex.sty` — shared package (options, fonts, layout, citations, glossaries, metadata, license handling)
+  - `beamerthemeqyber.sty`, `beamerinnerthemeqyber.sty`, `beamerouterthemeqyber.sty`, `beamercolorthemeqyber.sty` — Qyber beamer theme
+  - `qtex-licenses.tex` — full license texts for inline output
 - `texcount.opt` — macro/environment rules for `texcount` word counting
 - `examples/qbook/`, `examples/qarticle/`, `examples/qslides/` — minimal working examples
 - `scripts/build-hacker-font.py` — build obfuscated fonts for the `obfuscate` option
