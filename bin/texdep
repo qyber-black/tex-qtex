@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w
+# texdep
+# Find tex dependencies
+#
+# SPDX-FileCopyrightText: 2004-2005 Frank Langbein <frank@langbein.org>
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Copyright (C) 2004-2005 Frank Langbein <frank@langbein.org>
+# All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it 
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+
+my $logfile = shift;
+my $file = $logfile;
+my $pdffile = $logfile;
+my $dep = "";
+
+$logfile =~ s/\.tex$/\.log/;
+$pdffile =~ s/\.tex$/\.pdf/;
+
+if (! -e $logfile) {
+  system ("pdflatex $file >/dev/null 2>&1; rm -f $pdffile");
+}
+
+open (FILE, "(cd .. && pwd 2>&1) |");
+@LINES = <FILE>;
+foreach $L (@LINES) {
+  $parent_dir = $L;
+}
+close (FILE);
+
+open (FILE, $logfile) || die "file $logfile not found";
+@LINES = <FILE>;
+close (FILE);
+
+$D = "";
+foreach $L (@LINES) {
+  $L =~ s/\n//;
+  $D = "$D$L";
+}
+
+@words = split (/ /, $D);
+foreach $word (@words) {
+  if ($word =~ /^\(/) {
+    $word =~ s/^\(//;
+    $word =~ s/\n//g;
+    if (!($word eq $file || $word eq "./${file}" || $word =~ /.*\.aux/) && -e $word) {
+      $word =~ s/^\.\.\//$parent_dir/;
+      $dep = "$dep $word";
+    }
+  } elsif (!($word eq $file || $word eq "./${file}") && $word =~ /\</) {
+    $word =~ s/^[^<]*<([^>]*)>.*$/$1/;
+    $word =~ s/,.*$//;
+    $word =~ s/^<//;
+    $word =~ s/\n//g;
+    $word =~ s/^\.\.\//$parent_dir/;
+    if (-e $word) {
+      $dep = "$dep $word";
+    }
+  }
+}
+
+print "$dep";

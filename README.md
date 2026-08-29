@@ -104,6 +104,11 @@ make hacker-font  # generate obfuscated fonts (optional SEED=n)
   - `beamerthemeqyber.sty`, `beamerinnerthemeqyber.sty`, `beamerouterthemeqyber.sty`, `beamercolorthemeqyber.sty` — Qyber beamer theme
   - `qtex-licenses.tex` — full license texts for inline output
 - `texcount.opt` — macro/environment rules for `texcount` word counting
+- `bin/texdep` -- emits the Makefile dependencies of a document (the files its
+  `.log` says it actually read), so a rebuild triggers on a changed class,
+  style or included figure. Perl, GPL-2.0-or-later; the one tool worth keeping
+  from the retired `/opt/texmf` tree, moved here 29 Aug 2026. On `PATH` via
+  `app` on any host that selects `tex-qtex`.
 - `examples/qbook/`, `examples/qarticle/`, `examples/qslides/` — minimal working examples
 - `scripts/build-hacker-font.py` — build obfuscated fonts for the `obfuscate` option
 
