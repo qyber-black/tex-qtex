@@ -4,7 +4,7 @@
 % SPDX-License-Identifier: LPPL-1.3c
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{qslides}[2026/03/02 Qyber slides class]
+\ProvidesClass{qslides}[2026/09/01 Qyber slides class]
 
 % Ensure qtex knows this is a slides document
 \PassOptionsToPackage{slides}{qtex}
@@ -69,7 +69,7 @@
 % Bridge qtex metadata into beamer's title/author/date inserts
 \def\inserttitle{\qtex@title}
 \def\insertauthor{\qtex@author}
-\def\insertdate{\qtex@date}
+\def\insertdate{\qtex@dateline}
 
 % --------------------------------------------------------------------------
 % Qyber beamer theme (layout and colours; local copies in tex-qtex)

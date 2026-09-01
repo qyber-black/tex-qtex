@@ -22,6 +22,11 @@
 % \documentclass[hacker,oneside,numeric,raggedright,fullwidth]{qarticle}
 
 \usepackage{lipsum}
+% qtex loads no theorem package, so a document that wants theorems loads
+% amsthm itself. This used to need \let\openbox\relax first, because
+% newtxmath (pdfTeX branch) had taken the name.
+\usepackage{amsthm}
+\newtheorem{lemma}{Lemma}
 
 % --------------------------------------------------------------------------
 %  Metadata
@@ -45,6 +50,9 @@ E-mail: \url{third@example.org}}
 \licenseyear{2026}
 
 \date{\today}
+% Normally written by the build; set literally here so the
+% example demonstrates the revision line.
+\version{example-1a2b3c4}
 \keywords{example, article, qtex, typography, acronyms, references, guide}
 
 \begin{document}
@@ -153,6 +161,12 @@ Three font families are available:
     ORCID) are printed by \verb|\printauthors| (see \S\ref{sec:authors}).
     \item \verb|\date{...}| --- date line; \verb|\today| produces the current
     date in ``day Month year'' format.
+    \item \verb|\version{...}| --- a revision identifying the source this
+    PDF was built from, printed after the date.  Unset by default, in which
+    case the date appears alone.  To stamp the git commit, have the build
+    write \verb|\version{...}| into a file and \verb|\InputIfFileExists| it:
+    \LaTeX{} cannot read the hash itself without shell escape, which many
+    hosted services disable.  See the README for the recipe.
 \end{itemize}
 
 \subsection{Keywords}
@@ -306,6 +320,48 @@ See Figure~\ref{fig:example} for the placeholder image.
 \end{table}
 
 Table~\ref{tab:summary} summarises the results.
+
+A wide table goes in \verb|fullwidthtable|, which overhangs the margins
+when the \texttt{fullwidth} option is given and is an ordinary table
+otherwise, so the document compiles either way.  The overhang is
+2\,cm on each side by default and is changed
+with \verb|\setfullwidthoverhang{2.5cm}|; the page has 3\,cm margins,
+so 2.5\,cm is about the practical maximum.
+
+\begin{fullwidthtable}[htbp]
+  \caption{A table set with \texttt{fullwidthtable}.  This document does
+    not pass the \texttt{fullwidth} option, so it is set at the normal
+    measure rather than failing to compile.}\label{tab:wide}
+  \begin{tabular}{lcccccc}
+    \hline
+    Run & Mean & Std.\ dev. & Median & Min & Max & $n$ \\
+    \hline
+    Baseline & 1.20 & 0.10 & 1.19 & 0.94 & 1.51 & 50 \\
+    Var.\ A  & 1.52 & 0.21 & 1.50 & 1.11 & 2.03 & 50 \\
+    \hline
+  \end{tabular}
+\end{fullwidthtable}
+
+\subsection{Code and identifiers}
+
+\verb|\code{...}| sets typewriter text that may break after \texttt{.},
+\texttt{\_}, \texttt{-}, \texttt{:} and \texttt{/}, without inserting a
+hyphen, so a long identifier wraps instead of running into the margin.
+The argument is detokenized, so underscores need no escaping:
+\code{timevarying.adversarial_fidelity} and
+\code{qrobustness/lengthspace.py}.
+
+\subsection{Theorems}
+
+Theorem environments come from \texttt{amsthm}, loaded by the document.
+
+\begin{lemma}\label{lem:example}
+  Every certificate needs a metric and a budget.
+\end{lemma}
+
+\begin{proof}
+  Immediate; note that the end-of-proof box renders.
+\end{proof}
 
 \lipsum[5]
 

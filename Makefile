@@ -130,7 +130,23 @@ wordcount:
 	  printf "  %-10s %s\n" "$$name:" "$$count"; \
 	done
 
-check:
+# latexmk exits 0 with undefined references and with text running past the
+# margin, so a build that "succeeded" says nothing about either. Overfull
+# boxes below OVERFULL_PT are ignored: microtype and ragged-right leave a
+# scatter of sub-point overruns that are invisible on the page.
+OVERFULL_PT ?= 1.0
+
+checklog:
+	@logs=""; \
+	for d in $(QBOOK_DIR) $(QARTICLE_DIR) $(QSLIDES_DIR); do \
+	  if [ -f $$d/main.log ]; then logs="$$logs $$d/main.log"; \
+	  else echo "$$(basename $$d): (not built; run make first)"; fi; \
+	done; \
+	if [ -n "$$logs" ]; then \
+	  python3 $(CURDIR)/scripts/checklog.py -t $(OVERFULL_PT) $$logs; \
+	fi
+
+check: checklog
 	@echo "Running REUSE lint..."; \
 	if command -v reuse >/dev/null 2>&1; then reuse lint; else echo "  (reuse not installed; install from https://reuse.software to enable)"; fi
 
@@ -145,6 +161,7 @@ help:
 	@echo "  make distclean  clean + remove PDFs and fonts/"
 	@echo "  make hacker-font  Generate obfuscated fonts (optional SEED=n)."
 	@echo "  make wordcount  Word count for both examples."
-	@echo "  make check     REUSE lint (license/copyright)."
+	@echo "  make checklog   Fail on undefined refs / overfull boxes in the logs."
+	@echo "  make check      checklog + REUSE lint (license/copyright)."
 	@echo ""
 	@echo "Engine: make ENGINE=lua (default) | ENGINE=pdf | ENGINE=xe"

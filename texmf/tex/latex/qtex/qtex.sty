@@ -6,7 +6,7 @@
 % SPDX-License-Identifier: LPPL-1.3c
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{qtex}[2026/03/02 Qyber shared typography and layout]
+\ProvidesPackage{qtex}[2026/09/01 Qyber shared typography and layout]
 
 \makeatletter
 
@@ -187,6 +187,41 @@
   \RequirePackage[numbers,sort&compress,square]{natbib}%
   \bibpunct{[}{]}{,}{n}{,}{,}%
 \fi
+% Breaking long typewriter words. xurl and breakurl below handle \url,
+% but a bare \texttt{some.long_identifier} is a single unbreakable word
+% and runs into the margin. Two provisions:
+%
+%   \code{...}  -- typewriter text that may break after . _ - : / with no
+%                  hyphen inserted, which is what code wants. Prefer it.
+%   [htt]       -- lets \texttt hyphenate generally, for text that is
+%                  already written with \texttt.
+%
+% htt is NOT loaded under the hacker font option, where \familydefault is
+% \ttdefault: it would then hyphenate the whole body, not just code.
+\ifqtex@font@hacker\else
+  \IfFileExists{hyphenat.sty}{\RequirePackage[htt]{hyphenat}}{%
+    \PackageWarning{qtex}{hyphenat not found; long \string\texttt words
+      may overrun the margin}%
+  }%
+\fi
+\newcommand{\qtex@codebreak}{\discretionary{}{}{}}
+\DeclareRobustCommand{\code}[1]{%
+  \begingroup
+    \ttfamily
+    \def\qtex@codescan##1{%
+      \ifx##1\qtex@codeend\else
+        ##1%
+        \ifx##1.\qtex@codebreak\else
+        \ifx##1_\qtex@codebreak\else
+        \ifx##1-\qtex@codebreak\else
+        \ifx##1:\qtex@codebreak\else
+        \ifx##1/\qtex@codebreak\fi\fi\fi\fi\fi
+        \expandafter\qtex@codescan
+      \fi}%
+    \expandafter\qtex@codescan\detokenize{#1}\qtex@codeend
+  \endgroup
+}
+
 \RequirePackage{xurl}
 \RequirePackage{hyperref}
 \ifPDFTeX
@@ -245,6 +280,14 @@
     \RequirePackage{newtxmath}%
     \renewcommand{\familydefault}{\ttdefault}%
   \fi
+  % newtxmath defines \openbox (its end-of-proof square). amsthm defines
+  % the same name with \newcommand and therefore stops with "Command
+  % \openbox already defined" for any document that states a theorem --
+  % and this package deliberately loads no theorem package, so that is
+  % every such document. Releasing the name here lets a later amsthm
+  % define its own; nothing in qtex uses \openbox. Only pdfTeX is
+  % affected, since the unicode-math branch below never loads newtxmath.
+  \@ifundefined{openbox}{}{\let\openbox\relax}%
 \else
   \RequirePackage{fontspec}%
   \defaultfontfeatures{Ligatures=TeX}%
@@ -489,8 +532,14 @@
   \RequirePackage{parskip}%
 \fi
 
+% The overhang each side. Settable by the document through
+% \setfullwidthoverhang; the page has 3cm margins, so values approaching
+% 3cm leave nothing and 2.5cm is about the practical maximum.
 \newlength{\qtex@fullwidth@overhang}
 \setlength{\qtex@fullwidth@overhang}{2cm}
+\newcommand{\setfullwidthoverhang}[1]{%
+  \setlength{\qtex@fullwidth@overhang}{#1}%
+}
 \ifqtex@fullwidth
   \newenvironment{fullwidth}{%
     \begin{adjustwidth}{-\qtex@fullwidth@overhang}{-\qtex@fullwidth@overhang}%
@@ -514,7 +563,23 @@
     \end{table}%
   }
 \else
+  % Without the option -- or when changepage is unavailable, which
+  % disables it above -- these must still exist, or a document that uses
+  % them stops with "Environment fullwidthtable undefined" rather than
+  % simply losing the overhang. Degrade to ordinary floats.
   \newenvironment{fullwidth}{\begingroup}{\endgroup}
+  \newenvironment{fullwidthfigure}[1][htbp]{%
+    \begin{figure}[#1]%
+    \centering
+  }{%
+    \end{figure}%
+  }
+  \newenvironment{fullwidthtable}[1][htbp]{%
+    \begin{table}[#1]%
+    \centering
+  }{%
+    \end{table}%
+  }
 \fi
 
 \newskip\qtex@newthoughtskip
@@ -540,11 +605,25 @@
 \newcommand{\qtex@degree}{}
 \newcommand{\qtex@university}{Your University}
 \newcommand{\qtex@date}{\today}
+% A revision identifying the source this PDF was built from -- a commit
+% hash, a release tag. Empty by default, so nothing changes for a
+% document that does not set one. See \qtex@dateline below and the
+% revision-stamping recipe in the README.
+\newcommand{\qtex@version}{}
 \renewcommand{\title}[1]{\gdef\qtex@title{#1}}
 \renewcommand{\author}[1]{\gdef\qtex@author{#1}}
 \newcommand{\degree}[1]{\gdef\qtex@degree{#1}}
 \newcommand{\university}[1]{\gdef\qtex@university{#1}}
 \renewcommand{\date}[1]{\gdef\qtex@date{#1}}
+\newcommand{\version}[1]{\gdef\qtex@version{#1}}
+% What the title blocks print: the date, and the revision after it when
+% one is set. Kept in one place so the three title pages agree.
+\newcommand{\qtex@dateline}{%
+  \qtex@date
+  \ifx\qtex@version\@empty\else
+    \space(\texttt{\qtex@version})%
+  \fi
+}
 \renewcommand{\today}{\number\day\ \ifcase\month\or
   January\or February\or March\or April\or May\or June\or
   July\or August\or September\or October\or November\or December\fi

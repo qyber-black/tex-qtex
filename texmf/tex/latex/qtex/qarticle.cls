@@ -5,7 +5,7 @@
 % SPDX-License-Identifier: LPPL-1.3c
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{qarticle}[2026/03/02 Qyber article class]
+\ProvidesClass{qarticle}[2026/09/01 Qyber article class]
 
 \PassOptionsToPackage{article}{qtex}
 
@@ -154,7 +154,7 @@
       \fi
     }%
     \vspace{0.5ex}%
-    {\normalsize \qtex@date\par}%
+    {\normalsize \qtex@dateline\par}%
     \vspace{0.5ex}%
   \end{center}%
 }

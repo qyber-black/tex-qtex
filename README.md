@@ -5,6 +5,27 @@ Unified LaTeX package providing three document classes: **qbook** (book-based, f
 > SPDX-FileCopyrightText: 2026 Frank Langbein <frank@langbein.org>
 > SPDX-License-Identifier: CC-BY-SA-4.0
 
+## Checking a build
+
+`latexmk` exits 0 with undefined references and with text running past
+the margin, so a build that "succeeded" says nothing about either.
+`make checklog` reads the logs instead and fails on undefined
+references, and on overfull boxes at or above `OVERFULL_PT` (default
+1.0pt -- microtype and ragged-right leave a scatter of sub-point
+overruns that are invisible on the page):
+
+    make checklog                 # all three examples
+    make checklog OVERFULL_PT=5   # only the gross ones
+
+`make check` runs it before the REUSE lint, so both gate together.
+
+`scripts/checklog.py [-t PT] LOG...` runs it on any logs; it checks every
+log before returning, so one bad log does not hide the state of the
+others. It is a
+script rather than a shell one-liner because `grep` on some systems is
+`ugrep`, whose `-c` prints nothing rather than `0` when there is no
+match -- indistinguishable from success in a pipeline.
+
 ## Classes
 
 ### qbook
@@ -73,7 +94,43 @@ Override the acronym file: `\renewcommand{\qtexacronymfile}{yourfile.tex}` in th
 - `\epigraph{text}{attribution}` — right-aligned quotation
 - `\newthought{text}` — small-caps opening for a new paragraph section
 - `\cite` warns; use `\citep` or `\citet`
-- `fullwidth`, `fullwidthfigure`, `fullwidthtable` environments (requires `fullwidth` option)
+- `\version{...}` -- a revision identifying the source a PDF was built
+  from, printed after the date on the title page of all three classes.
+  Unset by default, in which case the date appears alone.
+
+  To stamp the git commit, have the build write it and `\input` the
+  result. LaTeX cannot obtain the hash itself: that needs `\write18`,
+  which Overleaf disables. Reading `.git/HEAD` with `\openin` would work
+  locally but cannot tell whether the tree is dirty, which is the part
+  worth knowing. So:
+
+  ```make
+  gitinfo:
+  	@printf '%% Auto-generated; do not edit, do not commit.\n' > gitinfo.tex
+  	@printf '\\version{%s%s}\n' \
+  	  "$$(git rev-parse --short HEAD 2>/dev/null || echo unknown)" \
+  	  "$$(git diff --quiet 2>/dev/null || echo '-dirty')" >> gitinfo.tex
+
+  paper: gitinfo
+  	latexmk main.tex
+  ```
+
+  with `\InputIfFileExists{gitinfo.tex}{}{}` in the preamble and
+  `gitinfo.tex` in `.gitignore`. Where the file is absent -- an Overleaf
+  build, or a plain `latexmk` run -- the date stands alone.
+
+- `\code{...}` -- typewriter text that may break after `.` `_` `-` `:` `/`
+  without inserting a hyphen, for long identifiers such as
+  `module.some_long_function`. Its argument is detokenized, so `_` and
+  other specials need no escaping. `\texttt` may also hyphenate, via
+  `hyphenat`, except under the `hacker` font option where the body font
+  is already typewriter.
+- `fullwidth`, `fullwidthfigure`, `fullwidthtable` environments. The
+  `fullwidth` class option makes them overhang the margins; without it
+  they are ordinary groups and floats, so a document compiles either
+  way. `\setfullwidthoverhang{2.5cm}` changes the overhang from its
+  2cm default -- the page has 3cm margins, so 2.5cm is about the
+  practical maximum.
 
 ## Supported licenses
 

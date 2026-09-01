@@ -4,7 +4,7 @@
 % SPDX-License-Identifier: LPPL-1.3c
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{qbook}[2026/03/02 Qyber book class]
+\ProvidesClass{qbook}[2026/09/01 Qyber book class]
 
 \PassOptionsToPackage{book}{qtex}
 
@@ -403,7 +403,7 @@
     \vfill
     {\Large \qtex@university\par}
     \vspace{2ex}
-    {\Large \qtex@date\par}
+    {\Large \qtex@dateline\par}
   \end{center}
   \newpage
 }
